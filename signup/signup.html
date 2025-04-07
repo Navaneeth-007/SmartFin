@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartFin - Sign Up</title>
+    <link rel="stylesheet" href="signup.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="signup-container">
+        <div class="signup-card glass-effect">
+            <div class="signup-header">
+                <div class="logo">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>SmartFin</span>
+                </div>
+                <h1>Create Account</h1>
+                <p>Join SmartFin to manage your finances smarter</p>
+            </div>
+            
+            <form id="signup-form" class="signup-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="firstname">
+                            <i class="fas fa-user"></i>
+                            First Name
+                        </label>
+                        <input type="text" id="firstname" name="firstname" placeholder="Enter your first name" required>
+                        <div class="error-message" id="firstname-error"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="lastname">
+                            <i class="fas fa-user"></i>
+                            Last Name
+                        </label>
+                        <input type="text" id="lastname" name="lastname" placeholder="Enter your last name" required>
+                        <div class="error-message" id="lastname-error"></div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">
+                        <i class="fas fa-envelope"></i>
+                        Email
+                    </label>
+                    <input type="email" id="email" name="email" placeholder="Enter your email" required>
+                    <div class="error-message" id="email-error"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone">
+                        <i class="fas fa-phone"></i>
+                        Phone Number
+                    </label>
+                    <input type="tel" id="phone" name="phone" placeholder="Enter your phone number" required>
+                    <div class="error-message" id="phone-error"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">
+                        <i class="fas fa-lock"></i>
+                        Password
+                    </label>
+                    <div class="password-input-container">
+                        <input type="password" id="password" name="password" placeholder="Create a password" required>
+                        <button type="button" class="toggle-password" id="toggle-password">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="error-message" id="password-error"></div>
+                    <div class="password-strength" id="password-strength">
+                        <div class="strength-meter">
+                            <div class="strength-meter-fill" id="strength-meter-fill"></div>
+                        </div>
+                        <div class="strength-text" id="strength-text">Password strength</div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirm-password">
+                        <i class="fas fa-lock"></i>
+                        Confirm Password
+                    </label>
+                    <div class="password-input-container">
+                        <input type="password" id="confirm-password" name="confirm-password" placeholder="Confirm your password" required>
+                        <button type="button" class="toggle-password" id="toggle-confirm-password">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="error-message" id="confirm-password-error"></div>
+                </div>
+                
+                <div class="form-group terms-group">
+                    <div class="checkbox-container">
+                        <input type="checkbox" id="terms" name="terms" required>
+                        <label for="terms">I agree to the <a href="#" class="terms-link">Terms of Service</a> and <a href="#" class="terms-link">Privacy Policy</a></label>
+                    </div>
+                    <div class="error-message" id="terms-error"></div>
+                </div>
+                
+                <button type="submit" class="signup-button">
+                    <span>Create Account</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </form>
+            
+            <div class="divider">
+                <span>or</span>
+            </div>
+            
+            <button type="button" class="google-button" id="google-signup">
+                <img src="https://www.google.com/favicon.ico" alt="Google" class="google-icon">
+                <span>Sign up with Google</span>
+            </button>
+            
+            <div class="signup-footer">
+                <p>Already have an account? <a href="../login/login.html" class="login-link">Sign in</a></p>
+            </div>
+            
+            <div class="theme-switch-wrapper">
+                <label class="theme-switch" for="checkbox">
+                    <input type="checkbox" id="checkbox" />
+                    <div class="slider round">
+                        <i class="fas fa-sun"></i>
+                        <i class="fas fa-moon"></i>
+                    </div>
+                </label>
+            </div>
+        </div>
+    </div>
+    
+    <script src="signup.js"></script>
+</body>
+</html> 
