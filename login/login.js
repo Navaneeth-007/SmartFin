@@ -34,7 +34,6 @@ togglePassword.addEventListener('click', () => {
 // Form validation
 const loginForm = document.getElementById('login-form');
 const emailInput = document.getElementById('email');
-const passwordInput = document.getElementById('password');
 const emailError = document.getElementById('email-error');
 const passwordError = document.getElementById('password-error');
 
@@ -72,46 +71,33 @@ passwordInput.addEventListener('input', () => {
     }
 });
 
-// Form submission
-loginForm.addEventListener('submit', (e) => {
+// Handle form submission
+loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    // Validate form
-    let isValid = true;
+    const email = emailInput.value;
+    const password = passwordInput.value;
+    const rememberMe = document.getElementById('remember').checked;
     
-    if (emailInput.value.trim() === '') {
-        emailError.textContent = 'Email is required';
-        isValid = false;
-    } else if (!validateEmail(emailInput.value)) {
-        emailError.textContent = 'Please enter a valid email address';
-        isValid = false;
-    } else {
-        emailError.textContent = '';
-    }
-    
-    if (passwordInput.value.trim() === '') {
-        passwordError.textContent = 'Password is required';
-        isValid = false;
-    } else if (!validatePassword(passwordInput.value)) {
-        passwordError.textContent = 'Password must be at least 8 characters with 1 uppercase, 1 lowercase, and 1 number';
-        isValid = false;
-    } else {
-        passwordError.textContent = '';
-    }
-    
-    if (isValid) {
-        // Show loading state
-        const loginButton = loginForm.querySelector('.login-button');
-        const originalButtonText = loginButton.innerHTML;
-        loginButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
-        loginButton.disabled = true;
+    try {
+        // Set persistence based on remember me checkbox
+        const persistence = rememberMe ? 
+            firebase.auth.Auth.Persistence.LOCAL : 
+            firebase.auth.Auth.Persistence.SESSION;
+            
+        await firebase.auth().setPersistence(persistence);
         
-        // Simulate API call
-        setTimeout(() => {
-            // For demo purposes, we'll just redirect to the home page
-            // In a real application, you would make an API call to authenticate
-            window.location.href = '../home/home.html';
-        }, 1500);
+        // Sign in with email and password
+        const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
+        const user = userCredential.user;
+        
+        // Redirect to home page
+        window.location.href = '../home/home.html';
+    } catch (error) {
+        console.error('Login error:', error);
+        const errorMessage = document.getElementById('password-error');
+        errorMessage.textContent = getErrorMessage(error.code);
+        errorMessage.style.display = 'block';
     }
 });
 
@@ -125,15 +111,6 @@ if (savedEmail) {
     rememberCheckbox.checked = true;
 }
 
-// Save email when form is submitted
-loginForm.addEventListener('submit', () => {
-    if (rememberCheckbox.checked) {
-        localStorage.setItem('rememberedEmail', emailInput.value);
-    } else {
-        localStorage.removeItem('rememberedEmail');
-    }
-});
-
 // Add animation to the login card
 document.addEventListener('DOMContentLoaded', () => {
     const loginCard = document.querySelector('.login-card');
@@ -141,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loginCard.style.transform = 'translateY(20px)';
     
     setTimeout(() => {
-        loginCard.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        loginCard.style.transition = 'all 0.5s ease';
         loginCard.style.opacity = '1';
         loginCard.style.transform = 'translateY(0)';
     }, 100);
@@ -150,15 +127,39 @@ document.addEventListener('DOMContentLoaded', () => {
 // Google Sign In
 const googleSignInButton = document.getElementById('google-signin');
 
-googleSignInButton.addEventListener('click', () => {
-    // Show loading state
-    googleSignInButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
-    googleSignInButton.disabled = true;
-    
-    // Simulate Google Sign In
-    setTimeout(() => {
-        // For demo purposes, we'll just redirect to the home page
-        // In a real application, you would implement Google OAuth
+// Handle Google Sign In
+googleSignInButton.addEventListener('click', async () => {
+    try {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        const result = await firebase.auth().signInWithPopup(provider);
+        const user = result.user;
+        
+        // Redirect to home page
         window.location.href = '../home/home.html';
-    }, 1500);
-}); 
+    } catch (error) {
+        console.error('Google sign in error:', error);
+        const errorMessage = document.getElementById('password-error');
+        errorMessage.textContent = getErrorMessage(error.code);
+        errorMessage.style.display = 'block';
+    }
+});
+
+// Helper function to get user-friendly error messages
+function getErrorMessage(errorCode) {
+    switch (errorCode) {
+        case 'auth/invalid-email':
+            return 'Invalid email address.';
+        case 'auth/user-disabled':
+            return 'This account has been disabled.';
+        case 'auth/user-not-found':
+            return 'No account found with this email.';
+        case 'auth/wrong-password':
+            return 'Incorrect password.';
+        case 'auth/too-many-requests':
+            return 'Too many failed attempts. Please try again later.';
+        case 'auth/popup-closed-by-user':
+            return 'Sign in was cancelled.';
+        default:
+            return 'An error occurred. Please try again.';
+    }
+} 

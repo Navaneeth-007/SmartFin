@@ -29,20 +29,80 @@ function formatIndianRupees(number) {
     return lastThree + decimalPart;
 }
 
-// Theme Switcher
-const themeToggle = document.getElementById('checkbox');
-const html = document.documentElement;
+// DOM Elements
+const themeToggle = document.querySelector('.theme-toggle');
+const logoutButton = document.getElementById('logout-button');
+const profileButton = document.querySelector('.profile-button');
+const dropdownMenu = document.querySelector('.dropdown-menu');
 
-// Check for saved theme preference
+// Theme Switching
+themeToggle.addEventListener('click', (e) => {
+    e.preventDefault();
+    const html = document.documentElement;
+    const currentTheme = html.getAttribute('data-theme');
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    html.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    
+    // Update chart colors
+    updateChartColors();
+});
+
+// Load saved theme
 const savedTheme = localStorage.getItem('theme') || 'light';
-html.setAttribute('data-theme', savedTheme);
-themeToggle.checked = savedTheme === 'dark';
+document.documentElement.setAttribute('data-theme', savedTheme);
 
-// Theme switch handler
-themeToggle.addEventListener('change', () => {
-    const theme = themeToggle.checked ? 'dark' : 'light';
-    html.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme);
+// Profile Dropdown
+profileButton.addEventListener('click', (e) => {
+    e.stopPropagation();
+    dropdownMenu.classList.toggle('show');
+});
+
+// Close dropdown when clicking outside
+document.addEventListener('click', (e) => {
+    if (!profileButton.contains(e.target)) {
+        dropdownMenu.classList.remove('show');
+    }
+});
+
+// Logout functionality
+logoutButton.addEventListener('click', async (e) => {
+    e.preventDefault();
+    try {
+        await firebase.auth().signOut();
+        window.location.href = '../login/login.html';
+    } catch (error) {
+        console.error('Error signing out:', error);
+    }
+});
+
+// Update profile information when auth state changes
+firebase.auth().onAuthStateChanged((user) => {
+    if (user) {
+        const profileName = document.querySelector('.profile-name');
+        const profileImage = document.querySelector('.profile-image');
+        
+        // Update profile name
+        profileName.textContent = user.displayName || 'User';
+        
+        // Update profile image
+        if (user.photoURL) {
+            profileImage.src = user.photoURL;
+        } else {
+            // Generate avatar with user's name
+            const name = user.displayName || 'User';
+            profileImage.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=6366f1&color=fff`;
+        }
+        
+        // Update welcome message
+        const welcomeName = document.querySelector('.welcome-section .highlight');
+        if (welcomeName) {
+            welcomeName.textContent = user.displayName || 'User';
+        }
+    } else {
+        // Redirect to login if not authenticated
+        window.location.href = '../login/login.html';
+    }
 });
 
 // Chart.js Configuration
@@ -108,7 +168,7 @@ const savingsChart = new Chart(savingsCtx, {
 
 // Update chart colors based on theme
 function updateChartColors() {
-    const isDark = html.getAttribute('data-theme') === 'dark';
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
     const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
     
     [spendingChart, savingsChart].forEach(chart => {
@@ -118,7 +178,7 @@ function updateChartColors() {
 }
 
 // Listen for theme changes
-themeToggle.addEventListener('change', updateChartColors);
+themeToggle.addEventListener('click', updateChartColors);
 
 // Initial chart color update
 updateChartColors();
