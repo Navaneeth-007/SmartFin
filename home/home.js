@@ -34,6 +34,10 @@ const themeToggle = document.querySelector('.theme-toggle');
 const logoutButton = document.getElementById('logout-button');
 const profileButton = document.querySelector('.profile-button');
 const dropdownMenu = document.querySelector('.dropdown-menu');
+const notificationButton = document.querySelector('.notification-button');
+const notificationDropdown = document.querySelector('.notification-dropdown');
+const markAllReadButton = document.querySelector('.mark-all-read');
+const notificationBadge = document.querySelector('.notification-badge');
 
 // Theme Switching
 themeToggle.addEventListener('click', (e) => {
@@ -51,6 +55,28 @@ themeToggle.addEventListener('click', (e) => {
 // Load saved theme
 const savedTheme = localStorage.getItem('theme') || 'light';
 document.documentElement.setAttribute('data-theme', savedTheme);
+
+// Notification Handling
+notificationButton.addEventListener('click', (e) => {
+    e.stopPropagation();
+    notificationDropdown.classList.toggle('show');
+});
+
+// Close notification dropdown when clicking outside
+document.addEventListener('click', (e) => {
+    if (!notificationButton.contains(e.target)) {
+        notificationDropdown.classList.remove('show');
+    }
+});
+
+// Mark all notifications as read
+markAllReadButton.addEventListener('click', () => {
+    const unreadNotifications = document.querySelectorAll('.notification-item.unread');
+    unreadNotifications.forEach(notification => {
+        notification.classList.remove('unread');
+    });
+    notificationBadge.style.display = 'none';
+});
 
 // Profile Dropdown
 profileButton.addEventListener('click', (e) => {
