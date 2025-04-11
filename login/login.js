@@ -1,34 +1,37 @@
-// Theme Switcher
-const themeToggle = document.getElementById('checkbox');
-const html = document.documentElement;
+// Theme Toggle Functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const themeToggle = document.getElementById('theme-toggle');
+    const html = document.documentElement;
 
-// Check for saved theme preference
-const savedTheme = localStorage.getItem('theme') || 'light';
-html.setAttribute('data-theme', savedTheme);
-themeToggle.checked = savedTheme === 'dark';
+    // Check for saved theme preference
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    html.setAttribute('data-theme', savedTheme);
 
-// Theme switch handler
-themeToggle.addEventListener('change', () => {
-    const theme = themeToggle.checked ? 'dark' : 'light';
-    html.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme);
+    // Theme switch handler
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    }
+
+    // Password Toggle Functionality
+    const togglePassword = document.getElementById('toggle-password');
+    const passwordInput = document.getElementById('password');
     
-    // Update the theme for the entire document
-    document.documentElement.setAttribute('data-theme', theme);
-});
-
-// Password visibility toggle
-const togglePassword = document.getElementById('toggle-password');
-const passwordInput = document.getElementById('password');
-
-togglePassword.addEventListener('click', () => {
-    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-    passwordInput.setAttribute('type', type);
-    
-    // Toggle eye icon
-    const icon = togglePassword.querySelector('i');
-    icon.classList.toggle('fa-eye');
-    icon.classList.toggle('fa-eye-slash');
+    if (togglePassword && passwordInput) {
+        togglePassword.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            
+            // Toggle the eye icon
+            const icon = this.querySelector('i');
+            icon.classList.toggle('fa-eye');
+            icon.classList.toggle('fa-eye-slash');
+        });
+    }
 });
 
 // Form validation

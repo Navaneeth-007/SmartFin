@@ -21,28 +21,56 @@ const passwordError = document.getElementById('password-error');
 const confirmPasswordError = document.getElementById('confirm-password-error');
 const termsError = document.getElementById('terms-error');
 
-// Theme switching
-themeSwitch.addEventListener('change', () => {
+// Theme Toggle Functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const themeToggle = document.getElementById('theme-toggle');
     const html = document.documentElement;
-    const currentTheme = html.getAttribute('data-theme');
-    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-    html.setAttribute('data-theme', newTheme);
-    localStorage.setItem('theme', newTheme);
-});
 
-// Password visibility toggle
-togglePassword.addEventListener('click', () => {
-    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-    passwordInput.setAttribute('type', type);
-    togglePassword.querySelector('i').classList.toggle('fa-eye');
-    togglePassword.querySelector('i').classList.toggle('fa-eye-slash');
-});
+    // Check for saved theme preference
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    html.setAttribute('data-theme', savedTheme);
 
-toggleConfirmPassword.addEventListener('click', () => {
-    const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-    confirmPasswordInput.setAttribute('type', type);
-    toggleConfirmPassword.querySelector('i').classList.toggle('fa-eye');
-    toggleConfirmPassword.querySelector('i').classList.toggle('fa-eye-slash');
+    // Theme switch handler
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    }
+
+    // Password Toggle Functionality
+    const togglePassword = document.getElementById('toggle-password');
+    const passwordInput = document.getElementById('password');
+    const toggleConfirmPassword = document.getElementById('toggle-confirm-password');
+    const confirmPasswordInput = document.getElementById('confirm-password');
+    
+    // Password field toggle
+    if (togglePassword && passwordInput) {
+        togglePassword.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            
+            // Toggle the eye icon
+            const icon = this.querySelector('i');
+            icon.classList.toggle('fa-eye');
+            icon.classList.toggle('fa-eye-slash');
+        });
+    }
+    
+    // Confirm password field toggle
+    if (toggleConfirmPassword && confirmPasswordInput) {
+        toggleConfirmPassword.addEventListener('click', function() {
+            const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            confirmPasswordInput.setAttribute('type', type);
+            
+            // Toggle the eye icon
+            const icon = this.querySelector('i');
+            icon.classList.toggle('fa-eye');
+            icon.classList.toggle('fa-eye-slash');
+        });
+    }
 });
 
 // Handle form submission
