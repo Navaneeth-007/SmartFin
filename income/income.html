@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartFin - Income</title>
+    <link rel="stylesheet" href="income.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <!-- Firebase SDK -->
+    <script type="module" src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Navigation Bar Container -->
+    <div id="navbar-container"></div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Header -->
+        <div class="header glass-effect">
+            <div class="welcome-section">
+                <h1>Income Overview</h1>
+                <p class="subtitle">Track and manage your income sources</p>
+            </div>
+        </div>
+        
+        <!-- Key Stats -->
+        <div class="stats-grid">
+            <div class="stat-card glass-effect">
+                <div class="stat-icon">
+                    <i class="fas fa-money-bill-wave"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>Total Income</h3>
+                    <p class="stat-value">₹32,500</p>
+                    <p class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        8.2% from last month
+                    </p>
+                </div>
+            </div>
+            
+            <div class="stat-card glass-effect">
+                <div class="stat-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>Average Monthly</h3>
+                    <p class="stat-value">₹28,750</p>
+                    <p class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        5.1% from last year
+                    </p>
+                </div>
+            </div>
+            
+            <div class="stat-card glass-effect">
+                <div class="stat-icon">
+                    <i class="fas fa-piggy-bank"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>Savings Rate</h3>
+                    <p class="stat-value">35%</p>
+                    <p class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        2.5% from last month
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Income Form -->
+        <div class="form-container glass-effect">
+            <h2>Add New Income</h2>
+            <form id="income-form">
+                <div class="form-group">
+                    <label for="income-source">Income Source</label>
+                    <input type="text" id="income-source" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="income-amount">Amount</label>
+                    <input type="number" id="income-amount" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="income-date">Date</label>
+                    <input type="date" id="income-date" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="income-category">Category</label>
+                    <select id="income-category" class="form-control" required>
+                        <option value="">Select Category</option>
+                        <option value="salary">Salary</option>
+                        <option value="freelance">Freelance</option>
+                        <option value="investment">Investment</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Add Income</button>
+            </form>
+        </div>
+        
+        <!-- Income List -->
+        <div class="income-list glass-effect">
+            <h2>Recent Income</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Source</th>
+                        <th>Category</th>
+                        <th>Amount</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="income-table-body">
+                    <!-- Income entries will be added here dynamically -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Load navigation bar
+        fetch('/components/navbar.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('navbar-container').innerHTML = html;
+                // Load navbar.js after the HTML is loaded
+                const script = document.createElement('script');
+                script.src = '/components/navbar.js';
+                document.body.appendChild(script);
+            })
+            .catch(error => console.error('Error loading navigation bar:', error));
+    </script>
+    <script src="income.js"></script>
+</body>
+</html> 

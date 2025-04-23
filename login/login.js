@@ -32,6 +32,29 @@ document.addEventListener('DOMContentLoaded', function() {
             icon.classList.toggle('fa-eye-slash');
         });
     }
+
+    // Google Sign In
+    const googleSignInButton = document.getElementById('google-signin');
+    
+    if (googleSignInButton) {
+        googleSignInButton.addEventListener('click', async () => {
+            try {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                const result = await firebase.auth().signInWithPopup(provider);
+                const user = result.user;
+                
+                // Redirect to home page
+                window.location.href = '../home/home.html';
+            } catch (error) {
+                console.error('Google sign in error:', error);
+                const errorMessage = document.getElementById('password-error');
+                if (errorMessage) {
+                    errorMessage.textContent = getErrorMessage(error.code);
+                    errorMessage.style.display = 'block';
+                }
+            }
+        });
+    }
 });
 
 // Form validation
@@ -94,6 +117,13 @@ loginForm.addEventListener('submit', async (e) => {
         const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
         const user = userCredential.user;
         
+        // Save email if remember me is checked
+        if (rememberMe) {
+            localStorage.setItem('rememberedEmail', email);
+        } else {
+            localStorage.removeItem('rememberedEmail');
+        }
+        
         // Redirect to home page
         window.location.href = '../home/home.html';
     } catch (error) {
@@ -127,26 +157,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 100);
 });
 
-// Google Sign In
-const googleSignInButton = document.getElementById('google-signin');
-
-// Handle Google Sign In
-googleSignInButton.addEventListener('click', async () => {
-    try {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        const result = await firebase.auth().signInWithPopup(provider);
-        const user = result.user;
-        
-        // Redirect to home page
-        window.location.href = '../home/home.html';
-    } catch (error) {
-        console.error('Google sign in error:', error);
-        const errorMessage = document.getElementById('password-error');
-        errorMessage.textContent = getErrorMessage(error.code);
-        errorMessage.style.display = 'block';
-    }
-});
-
 // Helper function to get user-friendly error messages
 function getErrorMessage(errorCode) {
     switch (errorCode) {
@@ -165,4 +175,44 @@ function getErrorMessage(errorCode) {
         default:
             return 'An error occurred. Please try again.';
     }
-} 
+}
+
+// Initialize Firebase
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js';
+import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+    // Your Firebase config here
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const googleProvider = new GoogleAuthProvider();
+
+// DOM Elements
+const googleButton = document.querySelector('.google-button');
+
+// Google Sign In
+googleButton.addEventListener('click', async () => {
+    try {
+        const result = await signInWithPopup(auth, googleProvider);
+        const user = result.user;
+        
+        // Redirect to home page
+        window.location.href = '/home/home.html';
+    } catch (error) {
+        console.error('Google sign in error:', error);
+        alert(error.message);
+    }
+});
+
+// Check for remembered email
+window.addEventListener('load', () => {
+    const rememberedEmail = localStorage.getItem('rememberedEmail');
+    if (rememberedEmail) {
+        emailInput.value = rememberedEmail;
+        rememberCheckbox.checked = true;
+    }
+}); 

@@ -217,3 +217,50 @@ document.querySelectorAll('.nav-link').forEach(link => {
         this.classList.add('active');
     });
 });
+
+// Import Firebase modules
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js';
+import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js';
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+// Update user name and current month
+function updateUserInfo() {
+    const userNameElement = document.getElementById('user-name');
+    const currentMonthElement = document.getElementById('current-month');
+    
+    // Get current month and year
+    const now = new Date();
+    const monthNames = ["January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+    const currentMonth = monthNames[now.getMonth()];
+    const currentYear = now.getFullYear();
+    
+    if (currentMonthElement) {
+        currentMonthElement.textContent = `${currentMonth} ${currentYear}`;
+    }
+    
+    // Listen for auth state changes
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            // User is signed in
+            const displayName = user.displayName || user.email.split('@')[0];
+            if (userNameElement) {
+                userNameElement.textContent = displayName;
+            }
+        } else {
+            // User is signed out
+            if (userNameElement) {
+                userNameElement.textContent = 'User';
+            }
+        }
+    });
+}
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    updateUserInfo();
+});

@@ -7,211 +7,116 @@
     <link rel="stylesheet" href="home.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <nav class="navbar glass-effect">
-        <div class="nav-container">
-            <div class="nav-left">
-                <div class="logo">
-                    <i class="fas fa-chart-pie"></i>
-                    <span>SmartFin</span>
-                </div>
-                <div class="nav-links">
-                    <a href="home.html" class="nav-link active">
-                        <i class="fas fa-home"></i>
-                        <span>Home</span>
-                    </a>
-                    <a href="expense.html" class="nav-link">
-                        <i class="fas fa-money-bill-wave"></i>
-                        <span>Expense</span>
-                    </a>
-                    <a href="income.html" class="nav-link">
-                        <i class="fas fa-hand-holding-usd"></i>
-                        <span>Income</span>
-                    </a>
-                </div>
-            </div>
-            <div class="nav-right">
-                <div class="notification-container">
-                    <button class="notification-button">
-                        <i class="fas fa-bell"></i>
-                        <span class="notification-label">Alerts</span>
-                        <span class="notification-badge">3</span>
-                    </button>
-                    <div class="notification-dropdown">
-                        <div class="notification-header">
-                            <h3>Alerts</h3>
-                            <button class="mark-all-read">Mark all as read</button>
-                        </div>
-                        <div class="notification-list">
-                            <div class="notification-item unread">
-                                <i class="fas fa-exclamation-circle"></i>
-                                <div class="notification-content">
-                                    <p>Your monthly budget for Food is about to exceed</p>
-                                    <span class="notification-time">2 hours ago</span>
-                                </div>
-                            </div>
-                            <div class="notification-item unread">
-                                <i class="fas fa-check-circle"></i>
-                                <div class="notification-content">
-                                    <p>Your savings goal for this month has been achieved!</p>
-                                    <span class="notification-time">1 day ago</span>
-                                </div>
-                            </div>
-                            <div class="notification-item">
-                                <i class="fas fa-info-circle"></i>
-                                <div class="notification-content">
-                                    <p>New feature: Track your expenses by category</p>
-                                    <span class="notification-time">2 days ago</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="profile-container">
-                    <div class="profile-dropdown">
-                        <button class="profile-button">
-                            <img src="https://ui-avatars.com/api/?name=User&background=6366f1&color=fff" alt="Profile" class="profile-image">
-                            <span class="profile-name">User</span>
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                        <div class="dropdown-menu">
-                            <a href="#" class="dropdown-item">
-                                <i class="fas fa-user"></i>
-                                Profile
-                            </a>
-                            <div class="dropdown-divider"></div>
-                            <a href="#" class="dropdown-item" id="logout-button">
-                                <i class="fas fa-sign-out-alt"></i>
-                                Logout
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <a href="#" class="nav-link theme-toggle">
-                    <i class="fas fa-sun light-icon"></i>
-                    <i class="fas fa-moon dark-icon"></i>
-                    <span>Theme</span>
-                </a>
-            </div>
-        </div>
-    </nav>
+    <!-- Navigation Bar Container -->
+    <div id="navbar-container"></div>
 
     <!-- Main Content -->
     <div class="container">
         <!-- Header -->
         <div class="header glass-effect">
             <div class="welcome-section">
-                <h1>Welcome back, <span class="highlight">Rajeesh!</span></h1>
-                <p class="subtitle">Here's your financial overview for March 2025</p>
-            </div>
-            <div class="header-actions">
-                <button class="action-button">
-                    <i class="fas fa-plus"></i>
-                    Add Transaction
-                </button>
+                <h1>Welcome back, <span class="highlight" id="user-name">User</span></h1>
+                <p class="subtitle">Here's your financial overview for <span id="current-month">March 2025</span></p>
             </div>
         </div>
         
         <!-- Key Stats -->
-        <div class="stats">
+        <div class="stats-grid">
             <div class="stat-card glass-effect">
                 <div class="stat-icon">
-                    <i class="fas fa-chart-line"></i>
+                    <i class="fas fa-wallet"></i>
                 </div>
-                <div class="stat-content">
-                    <div class="stat-title">Monthly Average</div>
-                    <div class="stat-value">₹1,85,250</div>
-                    <div class="stat-trend trend-down">
-                        <i class="fas fa-arrow-down"></i>
-                        <span>3.2% vs last month</span>
-                    </div>
-                </div>
-            </div>
-            <div class="stat-card glass-effect">
-                <div class="stat-icon">
-                    <i class="fas fa-piggy-bank"></i>
-                </div>
-                <div class="stat-content">
-                    <div class="stat-title">Predicted Savings</div>
-                    <div class="stat-value">₹54,360</div>
-                    <div class="stat-trend trend-up">
+                <div class="stat-info">
+                    <h3>Total Balance</h3>
+                    <p class="stat-value">₹45,678</p>
+                    <p class="stat-change positive">
                         <i class="fas fa-arrow-up"></i>
-                        <span>5.8% vs last month</span>
-                    </div>
-                </div>
-            </div>
-            <div class="stat-card glass-effect">
-                <div class="stat-icon">
-                    <i class="fas fa-chart-pie"></i>
-                </div>
-                <div class="stat-content">
-                    <div class="stat-title">Savings Forecast</div>
-                    <div class="stat-value">92%</div>
-                    <div class="stat-trend trend-up">
-                        <i class="fas fa-check-circle"></i>
-                        <span>Positive outlook</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Dashboard -->
-        <div class="dashboard">
-            <!-- Spending Insights -->
-            <div class="card glass-effect">
-                <div class="card-header">
-                    <div class="card-title">
-                        <i class="fas fa-chart-bar"></i>
-                        Spending Insights
-                    </div>
-                    <button class="icon-button">
-                        <i class="fas fa-ellipsis-v"></i>
-                    </button>
-                </div>
-                <div class="chart-container">
-                    <canvas id="spendingChart"></canvas>
-                </div>
-                <div class="insights">
-                    <p>Your biggest expense category is <strong>Housing</strong> at 32% of your total spending.</p>
-                    <p class="ai-suggestion">
-                        <i class="fas fa-robot"></i>
-                        AI Suggestion: Reducing dining out could save you ₹9,060 this month.
+                        12.5% from last month
                     </p>
                 </div>
             </div>
             
-            <!-- Savings Insights -->
-            <div class="card glass-effect">
-                <div class="card-header">
-                    <div class="card-title">
-                        <i class="fas fa-piggy-bank"></i>
-                        Savings Insights
-                    </div>
-                    <button class="icon-button">
-                        <i class="fas fa-ellipsis-v"></i>
-                    </button>
+            <div class="stat-card glass-effect">
+                <div class="stat-icon">
+                    <i class="fas fa-arrow-up"></i>
                 </div>
-                <div class="chart-container">
-                    <canvas id="savingsChart"></canvas>
+                <div class="stat-info">
+                    <h3>Total Income</h3>
+                    <p class="stat-value">₹32,500</p>
+                    <p class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        8.2% from last month
+                    </p>
                 </div>
-                <div class="insights">
-                    <p>You're on track to reach your <strong>vacation fund</strong> goal by August.</p>
-                    <p class="ai-suggestion">
-                        <i class="fas fa-robot"></i>
-                        AI Suggestion: Set up an automatic transfer of ₹3,775/week to boost your emergency fund.
+            </div>
+            
+            <div class="stat-card glass-effect">
+                <div class="stat-icon">
+                    <i class="fas fa-arrow-down"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>Total Expenses</h3>
+                    <p class="stat-value">₹15,200</p>
+                    <p class="stat-change negative">
+                        <i class="fas fa-arrow-up"></i>
+                        5.1% from last month
                     </p>
                 </div>
             </div>
         </div>
+        
+        <!-- Trend Graphs -->
+        <div class="charts-grid">
+            <div class="chart-card glass-effect">
+                <div class="chart-header">
+                    <h3>Monthly Overview</h3>
+                    <div class="chart-actions">
+                        <button class="chart-action-btn" data-chart="monthly">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="monthlyChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-card glass-effect">
+                <div class="chart-header">
+                    <h3>Category Breakdown</h3>
+                    <div class="chart-actions">
+                        <button class="chart-action-btn" data-chart="category">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+        </div>
     </div>
-    
-    <!-- Firebase Config -->
-    <script src="../firebase-config/firebase-config.js"></script>
-    <script src="../firebase-config/auth-state.js"></script>
-    <script src="../firebase-config/user-profile.js"></script>
+
+    <!-- Scripts -->
+    <script>
+        // Load navigation bar
+        fetch('/components/navbar.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('navbar-container').innerHTML = html;
+                // Load navbar.js after the HTML is loaded
+                const script = document.createElement('script');
+                script.src = '/components/navbar.js';
+                document.body.appendChild(script);
+            })
+            .catch(error => console.error('Error loading navigation bar:', error));
+    </script>
     <script src="home.js"></script>
 </body>
 <footer>

@@ -1,0 +1,78 @@
+<!-- Navigation Bar Component -->
+<link rel="stylesheet" href="/components/navbar.css">
+
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="nav-left">
+            <a href="/home/home.html" class="logo">
+                <i class="fas fa-wallet"></i>
+                <span>SmartFin</span>
+            </a>
+            <div class="nav-links">
+                <a href="/home/home.html" class="nav-link">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+                <a href="/expense/expense.html" class="nav-link">
+                    <i class="fas fa-receipt"></i>
+                    <span>Expense</span>
+                </a>
+                <a href="/income/income.html" class="nav-link">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <span>Income</span>
+                </a>
+            </div>
+        </div>
+        <div class="nav-right">
+            <div class="notification-container">
+                <button class="notification-button">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">0</span>
+                </button>
+                <!-- Notification Dropdown will be loaded here -->
+            </div>
+            <div class="profile-container">
+                <button class="profile-button">
+                    <img src="/assets/images/default-avatar.png" alt="Profile" class="profile-image" id="profile-image">
+                    <span class="profile-name" id="profile-name">User</span>
+                </button>
+                <div class="dropdown-menu">
+                    <a href="/profile/profile.html" class="dropdown-item">
+                        <i class="fas fa-user"></i>
+                        <span>Profile</span>
+                    </a>
+                    <a href="/settings/settings.html" class="dropdown-item">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="/login/login.html" class="dropdown-item">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </div>
+            <button class="theme-toggle">
+                <i class="fas fa-sun light-icon"></i>
+                <i class="fas fa-moon dark-icon"></i>
+            </button>
+        </div>
+    </div>
+</nav>
+
+<!-- Load notification component -->
+<script>
+    fetch('/components/notifications.html')
+        .then(response => response.text())
+        .then(html => {
+            const notificationContainer = document.querySelector('.notification-container');
+            if (notificationContainer) {
+                notificationContainer.insertAdjacentHTML('beforeend', html);
+                // Load notifications.js after the HTML is loaded
+                const script = document.createElement('script');
+                script.src = '/components/notifications.js';
+                document.body.appendChild(script);
+            }
+        })
+        .catch(error => console.error('Error loading notification component:', error));
+</script> 

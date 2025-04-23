@@ -1,3 +1,17 @@
+// Initialize Firebase
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js';
+import { getAuth, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+    // Your Firebase config here
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const googleProvider = new GoogleAuthProvider();
+
 // DOM Elements
 const signupForm = document.getElementById('signup-form');
 const firstnameInput = document.getElementById('firstname');
@@ -77,27 +91,35 @@ document.addEventListener('DOMContentLoaded', function() {
 signupForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     
+    const name = `${firstnameInput.value} ${lastnameInput.value}`;
+    const email = emailInput.value;
+    const password = passwordInput.value;
+    const confirmPassword = confirmPasswordInput.value;
+    
     // Validate passwords match
-    if (passwordInput.value !== confirmPasswordInput.value) {
+    if (password !== confirmPassword) {
         confirmPasswordError.textContent = 'Passwords do not match';
         confirmPasswordError.style.display = 'block';
         return;
     }
     
+    // Validate terms accepted
+    if (!termsCheckbox.checked) {
+        termsError.textContent = 'Please accept the terms and conditions';
+        termsError.style.display = 'block';
+        return;
+    }
+    
     try {
-        console.log('Attempting to create user with email:', emailInput.value);
+        console.log('Attempting to create user with email:', email);
         
-        // Create user with email and password
-        const userCredential = await firebase.auth().createUserWithEmailAndPassword(
-            emailInput.value,
-            passwordInput.value
-        );
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         console.log('User created successfully:', user.uid);
         
         // Update user profile
         await user.updateProfile({
-            displayName: `${firstnameInput.value} ${lastnameInput.value}`,
+            displayName: name,
             photoURL: null // You can add a default avatar URL here
         });
         console.log('User profile updated successfully');
@@ -124,8 +146,7 @@ signupForm.addEventListener('submit', async (e) => {
 googleSignUpButton.addEventListener('click', async () => {
     try {
         console.log('Attempting Google sign up');
-        const provider = new firebase.auth.GoogleAuthProvider();
-        const result = await firebase.auth().signInWithPopup(provider);
+        const result = await signInWithPopup(auth, googleProvider);
         const user = result.user;
         console.log('Google sign up successful:', user.uid);
         
