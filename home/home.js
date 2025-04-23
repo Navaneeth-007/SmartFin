@@ -102,35 +102,6 @@ logoutButton.addEventListener('click', async (e) => {
     }
 });
 
-// Update profile information when auth state changes
-firebase.auth().onAuthStateChanged((user) => {
-    if (user) {
-        const profileName = document.querySelector('.profile-name');
-        const profileImage = document.querySelector('.profile-image');
-        
-        // Update profile name
-        profileName.textContent = user.displayName || 'User';
-        
-        // Update profile image
-        if (user.photoURL) {
-            profileImage.src = user.photoURL;
-        } else {
-            // Generate avatar with user's name
-            const name = user.displayName || 'User';
-            profileImage.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=6366f1&color=fff`;
-        }
-        
-        // Update welcome message
-        const welcomeName = document.querySelector('.welcome-section .highlight');
-        if (welcomeName) {
-            welcomeName.textContent = user.displayName || 'User';
-        }
-    } else {
-        // Redirect to login if not authenticated
-        window.location.href = '../login/login.html';
-    }
-});
-
 // Chart.js Configuration
 const chartConfig = {
     type: 'line',
@@ -251,11 +222,30 @@ function updateUserInfo() {
             if (userNameElement) {
                 userNameElement.textContent = displayName;
             }
+            
+            // Update profile information
+            const profileName = document.querySelector('.profile-name');
+            const profileImage = document.querySelector('.profile-image');
+            
+            if (profileName) {
+                profileName.textContent = displayName;
+            }
+            
+            if (profileImage) {
+                if (user.photoURL) {
+                    profileImage.src = user.photoURL;
+                } else {
+                    // Generate avatar with user's name
+                    profileImage.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=6366f1&color=fff`;
+                }
+            }
         } else {
             // User is signed out
             if (userNameElement) {
                 userNameElement.textContent = 'User';
             }
+            // Redirect to login if not authenticated
+            window.location.href = '/login/login.html';
         }
     });
 }

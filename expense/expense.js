@@ -205,6 +205,9 @@ function initializeDateSelectors() {
     // Set current month
     monthSelect.value = currentDate.getMonth();
     
+    // Clear existing options
+    yearSelect.innerHTML = '';
+    
     // Populate years (last 5 years)
     for (let year = currentYear; year >= currentYear - 4; year--) {
         const option = document.createElement('option');
@@ -248,6 +251,15 @@ async function loadExpenses() {
         const querySnapshot = await getDocs(q);
         expenseTableBody.innerHTML = '';
         
+        if (querySnapshot.empty) {
+            expenseTableBody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="text-center">No expenses found for this period</td>
+                </tr>
+            `;
+            return;
+        }
+        
         querySnapshot.forEach((doc) => {
             const expense = doc.data();
             const row = document.createElement('tr');
@@ -273,6 +285,11 @@ async function loadExpenses() {
         });
     } catch (error) {
         console.error('Error loading expenses:', error);
+        expenseTableBody.innerHTML = `
+            <tr>
+                <td colspan="5" class="text-center">Error loading expenses. Please try again.</td>
+            </tr>
+        `;
     }
 }
 
