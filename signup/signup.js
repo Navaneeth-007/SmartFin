@@ -1,10 +1,18 @@
+// Import theme configuration
+import { initializeTheme } from '../shared/theme-config.js';
+
 // Initialize Firebase
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js';
 import { getAuth, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-    // Your Firebase config here
+    apiKey: "AIzaSyBPyEBGDaOFeWNI7HnYmRe1XMjWVX_LIL0",
+    authDomain: "smartfin-5c89b.firebaseapp.com",
+    projectId: "smartfin-5c89b",
+    storageBucket: "smartfin-5c89b.appspot.com",
+    messagingSenderId: "378095667140",
+    appId: "1:378095667140:web:a08fae7cc6e83f0c3a1b84"
 };
 
 // Initialize Firebase
@@ -23,7 +31,6 @@ const confirmPasswordInput = document.getElementById('confirm-password');
 const togglePassword = document.getElementById('toggle-password');
 const toggleConfirmPassword = document.getElementById('toggle-confirm-password');
 const googleSignUpButton = document.getElementById('google-signup');
-const themeSwitch = document.getElementById('checkbox');
 const termsCheckbox = document.getElementById('terms');
 
 // Error elements
@@ -37,22 +44,7 @@ const termsError = document.getElementById('terms-error');
 
 // Theme Toggle Functionality
 document.addEventListener('DOMContentLoaded', function() {
-    const themeToggle = document.getElementById('theme-toggle');
-    const html = document.documentElement;
-
-    // Check for saved theme preference
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    html.setAttribute('data-theme', savedTheme);
-
-    // Theme switch handler
-    if (themeToggle) {
-        themeToggle.addEventListener('click', () => {
-            const currentTheme = html.getAttribute('data-theme');
-            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-            html.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-        });
-    }
+    initializeTheme();
 
     // Password Toggle Functionality
     const togglePassword = document.getElementById('toggle-password');
@@ -87,6 +79,33 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+// Function to show error message
+function showError(elementId, message) {
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-message';
+    errorDiv.textContent = message;
+    
+    const inputGroup = document.getElementById(elementId).closest('.input-group');
+    // Remove any existing error message
+    const existingError = inputGroup.querySelector('.error-message');
+    if (existingError) {
+        existingError.remove();
+    }
+    
+    inputGroup.classList.add('error');
+    inputGroup.appendChild(errorDiv);
+}
+
+// Function to clear error message
+function clearError(elementId) {
+    const inputGroup = document.getElementById(elementId).closest('.input-group');
+    const errorDiv = inputGroup.querySelector('.error-message');
+    if (errorDiv) {
+        errorDiv.remove();
+    }
+    inputGroup.classList.remove('error');
+}
+
 // Handle form submission
 signupForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -95,18 +114,29 @@ signupForm.addEventListener('submit', async (e) => {
     const email = emailInput.value;
     const password = passwordInput.value;
     const confirmPassword = confirmPasswordInput.value;
+    const terms = termsCheckbox.checked;
     
-    // Validate passwords match
-    if (password !== confirmPassword) {
-        confirmPasswordError.textContent = 'Passwords do not match';
-        confirmPasswordError.style.display = 'block';
+    // Clear any existing errors
+    clearError('firstname');
+    clearError('lastname');
+    clearError('email');
+    clearError('phone');
+    clearError('password');
+    clearError('confirm-password');
+    
+    // Validate form
+    if (!name.trim()) {
+        showError('firstname', 'Name is required');
         return;
     }
     
-    // Validate terms accepted
-    if (!termsCheckbox.checked) {
-        termsError.textContent = 'Please accept the terms and conditions';
-        termsError.style.display = 'block';
+    if (!terms) {
+        showError('terms', 'Please accept the Terms of Service and Privacy Policy');
+        return;
+    }
+    
+    if (password !== confirmPassword) {
+        showError('confirm-password', 'Passwords do not match');
         return;
     }
     
@@ -137,8 +167,19 @@ signupForm.addEventListener('submit', async (e) => {
         window.location.href = '../home/home.html';
     } catch (error) {
         console.error('Signup error:', error);
-        emailError.textContent = getErrorMessage(error.code);
-        emailError.style.display = 'block';
+        switch (error.code) {
+            case 'auth/email-already-in-use':
+                showError('email', 'Email already in use');
+                break;
+            case 'auth/invalid-email':
+                showError('email', 'Invalid email address');
+                break;
+            case 'auth/weak-password':
+                showError('password', 'Password should be at least 6 characters');
+                break;
+            default:
+                showError('email', 'An error occurred. Please try again');
+        }
     }
 });
 
@@ -154,28 +195,13 @@ googleSignUpButton.addEventListener('click', async () => {
         window.location.href = '../home/home.html';
     } catch (error) {
         console.error('Google sign up error:', error);
-        emailError.textContent = getErrorMessage(error.code);
-        emailError.style.display = 'block';
+        if (error.code === 'auth/popup-closed-by-user') {
+            showError('email', 'Sign up cancelled');
+        } else {
+            showError('email', 'Could not sign up with Google. Please try again');
+        }
     }
 });
-
-// Helper function to get user-friendly error messages
-function getErrorMessage(errorCode) {
-    switch (errorCode) {
-        case 'auth/email-already-in-use':
-            return 'This email is already registered.';
-        case 'auth/invalid-email':
-            return 'Invalid email address.';
-        case 'auth/operation-not-allowed':
-            return 'Email/password accounts are not enabled.';
-        case 'auth/weak-password':
-            return 'Password is too weak.';
-        case 'auth/popup-closed-by-user':
-            return 'Sign up was cancelled.';
-        default:
-            return 'An error occurred. Please try again.';
-    }
-}
 
 // Add animation to the signup card
 document.addEventListener('DOMContentLoaded', () => {

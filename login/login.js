@@ -1,21 +1,9 @@
+// Import theme configuration
+import { initializeTheme } from '../shared/theme-config.js';
+
 // Theme Toggle Functionality
 document.addEventListener('DOMContentLoaded', function() {
-    const themeToggle = document.getElementById('theme-toggle');
-    const html = document.documentElement;
-
-    // Check for saved theme preference
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    html.setAttribute('data-theme', savedTheme);
-
-    // Theme switch handler
-    if (themeToggle) {
-        themeToggle.addEventListener('click', () => {
-            const currentTheme = html.getAttribute('data-theme');
-            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-            html.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-        });
-    }
+    initializeTheme();
 
     // Password Toggle Functionality
     const togglePassword = document.getElementById('toggle-password');
@@ -183,7 +171,12 @@ import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopu
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-    // Your Firebase config here
+    apiKey: "AIzaSyBPyEBGDaOFeWNI7HnYmRe1XMjWVX_LIL0",
+    authDomain: "smartfin-5c89b.firebaseapp.com",
+    projectId: "smartfin-5c89b",
+    storageBucket: "smartfin-5c89b.appspot.com",
+    messagingSenderId: "378095667140",
+    appId: "1:378095667140:web:a08fae7cc6e83f0c3a1b84"
 };
 
 // Initialize Firebase
@@ -191,20 +184,84 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
 
-// DOM Elements
-const googleButton = document.querySelector('.google-button');
+// Function to show error message
+function showError(elementId, message) {
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-message';
+    errorDiv.textContent = message;
+    
+    const inputGroup = document.getElementById(elementId).closest('.input-group');
+    // Remove any existing error message
+    const existingError = inputGroup.querySelector('.error-message');
+    if (existingError) {
+        existingError.remove();
+    }
+    
+    inputGroup.classList.add('error');
+    inputGroup.appendChild(errorDiv);
+}
 
-// Google Sign In
-googleButton.addEventListener('click', async () => {
+// Function to clear error message
+function clearError(elementId) {
+    const inputGroup = document.getElementById(elementId).closest('.input-group');
+    const errorDiv = inputGroup.querySelector('.error-message');
+    if (errorDiv) {
+        errorDiv.remove();
+    }
+    inputGroup.classList.remove('error');
+}
+
+// Handle form submission
+document.getElementById('login-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    
+    // Clear any existing errors
+    clearError('email');
+    clearError('password');
+    
+    try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        console.log('User logged in successfully:', userCredential.user);
+        // Redirect to home page
+        window.location.href = '../home/home.html';
+    } catch (error) {
+        console.error('Login error:', error);
+        switch (error.code) {
+            case 'auth/invalid-email':
+                showError('email', 'Invalid email address');
+                break;
+            case 'auth/user-not-found':
+                showError('email', 'No account found with this email');
+                break;
+            case 'auth/wrong-password':
+                showError('password', 'Incorrect password');
+                break;
+            case 'auth/too-many-requests':
+                showError('password', 'Too many failed attempts. Please try again later');
+                break;
+            default:
+                showError('email', 'An error occurred. Please try again');
+        }
+    }
+});
+
+// Handle Google Sign In
+document.getElementById('google-login').addEventListener('click', async () => {
     try {
         const result = await signInWithPopup(auth, googleProvider);
-        const user = result.user;
-        
+        console.log('Google sign in successful:', result.user);
         // Redirect to home page
-        window.location.href = '/home/home.html';
+        window.location.href = '../home/home.html';
     } catch (error) {
         console.error('Google sign in error:', error);
-        alert(error.message);
+        if (error.code === 'auth/popup-closed-by-user') {
+            showError('email', 'Sign in cancelled');
+        } else {
+            showError('email', 'Could not sign in with Google. Please try again');
+        }
     }
 });
 

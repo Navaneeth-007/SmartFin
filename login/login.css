@@ -101,26 +101,36 @@ body {
 }
 
 .logo {
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
     margin-bottom: 2rem;
-    animation: pulse 2s infinite;
 }
 
-.logo i {
-    font-size: 3rem;
-    color: var(--primary-color);
-    margin-bottom: 1rem;
+.logo-icon {
+    width: 40px;
+    height: 40px;
+    background: #4A90E2;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.logo h1 {
-    font-size: 2rem;
-    color: var(--primary-color);
-    margin-bottom: 0.5rem;
+.logo-icon i {
+    font-size: 1.5rem;
+    color: white;
 }
 
-.logo p {
-    color: var(--text-secondary);
-    font-size: 1rem;
+.logo-text {
+    font-size: 1.75rem;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+[data-theme="dark"] .logo-text {
+    color: #fff;
 }
 
 .form-group {
@@ -360,12 +370,17 @@ body {
         padding: 1.5rem;
     }
     
-    .logo i {
-        font-size: 2.5rem;
+    .logo-icon {
+        width: 30px;
+        height: 30px;
     }
     
-    .logo h1 {
-        font-size: 1.75rem;
+    .logo-icon i {
+        font-size: 1.2rem;
+    }
+    
+    .logo-text {
+        font-size: 1.5rem;
     }
     
     .google-button {
@@ -533,4 +548,66 @@ body {
 
 .toggle-password:hover {
     color: var(--primary-color);
+}
+
+/* Input field styles */
+.input-group {
+    position: relative;
+    margin-bottom: 1.5rem;
+    width: 100%;
+}
+
+.input-group i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    transition: color 0.3s ease;
+    pointer-events: none;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 0.875rem 1rem 0.875rem 2.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background-color: var(--input-bg);
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+.input-group input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+    outline: none;
+}
+
+.input-group input:focus + i {
+    color: var(--primary-color);
+}
+
+.input-group input::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.7;
+}
+
+/* Error state */
+.input-group.error input {
+    border-color: var(--error-color);
+}
+
+.input-group.error i {
+    color: var(--error-color);
+}
+
+.input-group .error-message {
+    position: absolute;
+    bottom: -1.25rem;
+    left: 0;
+    color: var(--error-color);
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
 } 

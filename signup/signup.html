@@ -5,17 +5,94 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SmartFin - Sign Up</title>
     <link rel="stylesheet" href="signup.css">
+    <link rel="stylesheet" href="../shared/theme.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <!-- Firebase SDK -->
     <script type="module" src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script type="module" src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --text-color: #333;
+            --bg-color: #ffffff;
+            --input-bg: #f5f5f5;
+            --border-color: #ddd;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --error-color: #e74c3c;
+            --success-color: #2ecc71;
+            --transition-speed: 0.3s;
+        }
+
+        [data-theme="dark"] {
+            --primary-color: #5c9ce6;
+            --text-color: #f5f5f5;
+            --bg-color: #1a1a1a;
+            --input-bg: #2d2d2d;
+            --border-color: #404040;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color var(--transition-speed), 
+                        color var(--transition-speed),
+                        border-color var(--transition-speed),
+                        box-shadow var(--transition-speed);
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+            transition: transform var(--transition-speed);
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .theme-toggle i {
+            position: absolute;
+            font-size: 1.2rem;
+            color: var(--text-color);
+            transition: opacity var(--transition-speed);
+        }
+
+        [data-theme="light"] .dark-icon {
+            opacity: 0;
+        }
+
+        [data-theme="dark"] .light-icon {
+            opacity: 0;
+        }
+    </style>
 </head>
 <body>
+    <!-- Theme Toggle Button -->
+    <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+        <i class="fas fa-sun light-icon"></i>
+        <i class="fas fa-moon dark-icon"></i>
+    </button>
+
     <div class="signup-container">
         <div class="signup-card glass-effect">
             <div class="logo">
-                <i class="fas fa-chart-pie"></i>
-                <span>SmartFin</span>
+                <div class="logo-icon">
+                    <i class="fas fa-chart-pie"></i>
+                </div>
+                <div class="logo-text">SmartFin</div>
             </div>
             <h2>Create Account</h2>
             <p>Join SmartFin to manage your finances</p>
@@ -81,5 +158,12 @@
     <!-- Firebase Config -->
     <script type="module" src="/firebase-config/firebase-config.js"></script>
     <script type="module" src="signup.js"></script>
+    <script type="module">
+        import { initializeTheme, setupThemeToggle } from '../shared/theme-config.js';
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeTheme();
+            setupThemeToggle();
+        });
+    </script>
 </body>
 </html> 

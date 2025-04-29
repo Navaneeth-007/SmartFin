@@ -5,20 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SmartFin - Login</title>
     <link rel="stylesheet" href="login.css">
+    <link rel="stylesheet" href="../shared/theme.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <!-- Firebase SDK -->
     <script type="module" src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script type="module" src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 </head>
 <body>
+    <!-- Theme Toggle Button -->
+    <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+        <i class="fas fa-sun light-icon" aria-hidden="true"></i>
+        <i class="fas fa-moon dark-icon" aria-hidden="true"></i>
+    </button>
+
     <div class="login-container">
         <div class="login-card glass-effect">
             <div class="logo">
-                <i class="fas fa-chart-pie"></i>
-                <span>SmartFin</span>
+                <div class="logo-icon">
+                    <i class="fas fa-chart-pie"></i>
+                </div>
+                <div class="logo-text">SmartFin</div>
             </div>
             <h2>Welcome Back</h2>
-            <p>Sign in to continue</p>
+            <p>Sign in to your account</p>
             
             <form id="login-form">
                 <div class="form-group">
@@ -39,7 +48,7 @@
                 
                 <div class="form-options">
                     <label class="checkbox-container">
-                        <input type="checkbox" id="remember-me">
+                        <input type="checkbox" id="remember">
                         <span class="checkmark"></span>
                         Remember me
                     </label>
@@ -50,7 +59,7 @@
                 
                 <div class="social-login">
                     <p>Or sign in with</p>
-                    <button type="button" class="google-button" id="google-signin">
+                    <button type="button" class="google-button" id="google-login">
                         <i class="fab fa-google"></i>
                         Sign in with Google
                     </button>
@@ -66,5 +75,12 @@
     <!-- Firebase Config -->
     <script type="module" src="/firebase-config/firebase-config.js"></script>
     <script type="module" src="login.js"></script>
+    <script type="module">
+        import { initializeTheme, setupThemeToggle } from '../shared/theme-config.js';
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeTheme();
+            setupThemeToggle();
+        });
+    </script>
 </body>
 </html> 

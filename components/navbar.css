@@ -1,14 +1,45 @@
-/* Navigation Bar Styles */
+/* Root Variables */
+:root {
+    --primary-color: #6366f1;
+    --secondary-color: #4f46e5;
+    --background-primary: #ffffff;
+    --background-secondary: #f3f4f6;
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+    --border-color: #e5e7eb;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --glass-background: rgba(255, 255, 255, 0.8);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --success-color: #10b981;
+    --danger-color: #ef4444;
+    --warning-color: #f59e0b;
+    --info-color: #3b82f6;
+}
+
+/* Dark Theme Variables */
+[data-theme="dark"] {
+    --primary-color: #818cf8;
+    --secondary-color: #6366f1;
+    --background-primary: #111827;
+    --background-secondary: #1f2937;
+    --text-primary: #f9fafb;
+    --text-secondary: #d1d5db;
+    --border-color: #374151;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+    --glass-background: rgba(17, 24, 39, 0.8);
+    --glass-border: rgba(255, 255, 255, 0.1);
+}
+
+/* Navbar Base Styles */
 .navbar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 1000;
     padding: 1rem 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
     background: var(--glass-background);
     backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--glass-border);
+    animation: slideIn 0.5s ease-out;
 }
 
 .nav-container {
@@ -19,16 +50,11 @@
     align-items: center;
 }
 
+/* Nav Left Section */
 .nav-left {
     display: flex;
     align-items: center;
     gap: 2rem;
-}
-
-.nav-right {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
 }
 
 .logo {
@@ -39,6 +65,11 @@
     font-weight: 700;
     color: var(--primary-color);
     text-decoration: none;
+    animation: pulse 2s infinite;
+}
+
+.logo i {
+    font-size: 1.8rem;
 }
 
 .nav-links {
@@ -64,6 +95,13 @@
     transform: translateY(-2px);
 }
 
+/* Nav Right Section */
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
 /* Notification Styles */
 .notification-container {
     position: relative;
@@ -80,6 +118,7 @@
     padding: 0.5rem 1rem;
     border-radius: 0.5rem;
     transition: all 0.3s ease;
+    position: relative;
 }
 
 .notification-button:hover {
@@ -105,19 +144,54 @@
     top: 100%;
     right: 0;
     margin-top: 0.5rem;
-    background: var(--card-background);
+    background: var(--background-primary);
     border-radius: 0.5rem;
     box-shadow: 0 4px 6px -1px var(--shadow-color);
     width: 320px;
-    display: none;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
     z-index: 1000;
 }
 
-.notification-dropdown.show {
-    display: block;
+.notification-container:hover .notification-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
 }
 
-/* Profile Styles */
+/* Theme Toggle */
+.theme-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.theme-toggle:hover {
+    color: var(--primary-color);
+    background: var(--glass-background);
+}
+
+.theme-toggle .light-icon,
+.theme-toggle .dark-icon {
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+[data-theme="light"] .theme-toggle .dark-icon,
+[data-theme="dark"] .theme-toggle .light-icon {
+    display: none;
+}
+
+/* Profile Dropdown */
 .profile-container {
     position: relative;
 }
@@ -136,7 +210,7 @@
 }
 
 .profile-button:hover {
-    transform: scale(1.05);
+    background: var(--glass-background);
 }
 
 .profile-image {
@@ -146,35 +220,60 @@
     object-fit: cover;
 }
 
+.profile-name {
+    font-weight: 500;
+}
+
 .dropdown-menu {
     position: absolute;
     top: 100%;
     right: 0;
     margin-top: 0.5rem;
-    background: var(--card-background);
+    background: var(--background-primary);
     border-radius: 0.5rem;
     box-shadow: 0 4px 6px -1px var(--shadow-color);
-    min-width: 200px;
-    display: none;
+    min-width: 250px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
     z-index: 1000;
 }
 
-.dropdown-menu.show {
-    display: block;
+.profile-dropdown:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
 }
 
-.dropdown-item {
+.dropdown-header {
+    padding: 1rem;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1rem;
-    color: var(--text-primary);
-    text-decoration: none;
-    transition: all 0.3s ease;
+    gap: 1rem;
+    border-bottom: 1px solid var(--border-color);
 }
 
-.dropdown-item:hover {
-    background: var(--glass-background);
+.dropdown-profile-image {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.dropdown-user-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.dropdown-username {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.dropdown-email {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
 }
 
 .dropdown-divider {
@@ -183,53 +282,35 @@
     margin: 0.5rem 0;
 }
 
-/* Theme Toggle Styles */
-.theme-toggle {
+.dropdown-item {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
-    background: none;
-    border: none;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
     color: var(--text-primary);
-    cursor: pointer;
+    text-decoration: none;
     transition: all 0.3s ease;
 }
 
-.theme-toggle:hover {
+.dropdown-item:hover {
     background: var(--glass-background);
-    transform: translateY(-2px);
+    color: var(--primary-color);
 }
 
-.theme-toggle .light-icon,
-.theme-toggle .dark-icon {
-    font-size: 1.2rem;
-    transition: all 0.3s ease;
+.dropdown-item i {
+    font-size: 1.1rem;
 }
 
-.theme-toggle .light-icon {
-    color: #f59e0b;
+/* Animations */
+@keyframes slideIn {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
 }
 
-.theme-toggle .dark-icon {
-    color: #6366f1;
-}
-
-[data-theme="light"] .theme-toggle .light-icon {
-    display: inline-block;
-}
-
-[data-theme="light"] .theme-toggle .dark-icon {
-    display: none;
-}
-
-[data-theme="dark"] .theme-toggle .light-icon {
-    display: none;
-}
-
-[data-theme="dark"] .theme-toggle .dark-icon {
-    display: inline-block;
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
 }
 
 /* Responsive Design */
