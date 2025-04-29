@@ -1,6 +1,7 @@
 // Import Firebase modules
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
-import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js';
+import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js';
+import { initializeTheme, setupThemeToggle } from '../shared/theme-config.js';
 
 // Initialize Firebase
 const firebaseConfig = {
@@ -24,138 +25,252 @@ const dropdownProfileImage = document.querySelector('.dropdown-profile-image');
 const dropdownUsername = document.querySelector('.dropdown-username');
 const dropdownEmail = document.querySelector('.dropdown-email');
 const logoutButton = document.getElementById('logout-button');
-const themeToggle = document.querySelector('.theme-toggle');
-const navLinks = document.querySelectorAll('.nav-link');
-const html = document.documentElement;
-
-// Notification Elements
 const notificationButton = document.querySelector('.notification-button');
 const notificationDropdown = document.querySelector('.notification-dropdown');
 const markAllReadButton = document.querySelector('.mark-all-read');
 const notificationBadge = document.querySelector('.notification-badge');
+const themeToggle = document.getElementById('theme-toggle');
 
-// Theme Toggle
-function toggleTheme() {
-    const currentTheme = document.documentElement.getAttribute('data-theme');
-    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', newTheme);
-    localStorage.setItem('theme', newTheme);
-}
-
-// Initialize theme from localStorage
-const savedTheme = localStorage.getItem('theme') || 'light';
-document.documentElement.setAttribute('data-theme', savedTheme);
-
-// Profile Dropdown Toggle
-function toggleProfileDropdown() {
-    profileDropdown.classList.toggle('show');
-}
-
-// Close dropdown when clicking outside
-document.addEventListener('click', (event) => {
-    if (!profileButton.contains(event.target) && !profileDropdown.contains(event.target)) {
-        profileDropdown.classList.remove('show');
+// Sample notifications data
+const sampleNotifications = [
+    {
+        id: 1,
+        title: 'Monthly Budget Update',
+        message: 'You have spent 75% of your monthly budget. ₹12,500 remaining.',
+        timestamp: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
+        read: false,
+        icon: 'fas fa-chart-pie'
+    },
+    {
+        id: 2,
+        title: 'Bill Payment Reminder',
+        message: 'Electricity bill of ₹2,500 is due in 3 days.',
+        timestamp: new Date(Date.now() - 7200000).toISOString(), // 2 hours ago
+        read: false,
+        icon: 'fas fa-bolt'
+    },
+    {
+        id: 3,
+        title: 'Savings Goal Achieved',
+        message: 'Congratulations! You have reached your emergency fund goal of ₹50,000.',
+        timestamp: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
+        read: true,
+        icon: 'fas fa-piggy-bank'
+    },
+    {
+        id: 4,
+        title: 'Investment Opportunity',
+        message: 'Your monthly SIP of ₹5,000 has been processed successfully.',
+        timestamp: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
+        read: true,
+        icon: 'fas fa-chart-line'
+    },
+    {
+        id: 5,
+        title: 'Spending Alert',
+        message: 'Your dining out expenses are 30% higher than last month.',
+        timestamp: new Date(Date.now() - 259200000).toISOString(), // 3 days ago
+        read: true,
+        icon: 'fas fa-utensils'
     }
-});
+];
 
-// Handle logout
-async function handleLogout() {
-    try {
-        await signOut(auth);
-        // Clear any stored data
-        localStorage.clear();
-        // Redirect to sign-in page
-        window.location.href = '/login/login.html';
-    } catch (error) {
-        console.error('Error signing out:', error);
-        alert('Failed to logout. Please try again.');
-    }
-}
-
-// Update active link based on current page
-function updateActiveLink() {
+// Function to update active nav link
+function updateActiveNavLink() {
     const currentPath = window.location.pathname;
+    const navLinks = document.querySelectorAll('.nav-link');
+    
     navLinks.forEach(link => {
-        if (link.getAttribute('href') === currentPath) {
+        link.classList.remove('active');
+        if (currentPath.includes(link.getAttribute('data-page'))) {
             link.classList.add('active');
-        } else {
-            link.classList.remove('active');
         }
     });
 }
 
-// Update profile information based on auth state
-function updateProfileInfo(user) {
+// Function to update profile display
+function updateProfileDisplay(user) {
+    const profileImage = document.querySelector('.profile-image');
+    const profileInitial = document.querySelector('.profile-initial');
+    const dropdownProfileImage = document.querySelector('.dropdown-profile-image');
+    const dropdownProfileInitial = document.querySelector('.dropdown-profile-initial');
+    const profileName = document.querySelector('.profile-name');
+    const dropdownUsername = document.querySelector('.dropdown-username');
+    const dropdownEmail = document.querySelector('.dropdown-email');
+    
     if (user) {
-        const displayName = user.displayName || 'User';
-        const email = user.email || 'user@example.com';
-        const photoURL = user.photoURL || 'https://via.placeholder.com/32';
-
+        const displayName = user.displayName || user.email.split('@')[0];
+        const initial = displayName.charAt(0).toUpperCase();
+        
+        // Update profile name and email
         profileName.textContent = displayName;
-        profileImage.src = photoURL;
         dropdownUsername.textContent = displayName;
-        dropdownEmail.textContent = email;
-        dropdownProfileImage.src = photoURL;
+        dropdownEmail.textContent = user.email;
+        
+        if (user.photoURL) {
+            // Show profile image if available
+            profileImage.src = user.photoURL;
+            dropdownProfileImage.src = user.photoURL;
+            profileImage.style.display = 'block';
+            dropdownProfileImage.style.display = 'block';
+            profileInitial.style.display = 'none';
+            dropdownProfileInitial.style.display = 'none';
+        } else {
+            // Show initial if no profile image
+            profileInitial.textContent = initial;
+            dropdownProfileInitial.textContent = initial;
+            profileInitial.style.display = 'block';
+            dropdownProfileInitial.style.display = 'block';
+            profileImage.style.display = 'none';
+            dropdownProfileImage.style.display = 'none';
+        }
     } else {
+        // Default state when no user is logged in
         profileName.textContent = 'Guest';
-        profileImage.src = 'https://via.placeholder.com/32';
         dropdownUsername.textContent = 'Guest';
         dropdownEmail.textContent = 'guest@example.com';
-        dropdownProfileImage.src = 'https://via.placeholder.com/48';
+        profileInitial.textContent = 'G';
+        dropdownProfileInitial.textContent = 'G';
+        profileInitial.style.display = 'block';
+        dropdownProfileInitial.style.display = 'block';
+        profileImage.style.display = 'none';
+        dropdownProfileImage.style.display = 'none';
     }
 }
 
-// Initialize event listeners
-function initializeEventListeners() {
-    // Profile dropdown toggle
-    if (profileButton) {
-        profileButton.addEventListener('click', toggleProfileDropdown);
+// Function to render notifications
+function renderNotifications() {
+    const notificationList = document.querySelector('.notification-list');
+    if (!notificationList) return;
+
+    // Clear empty state if it exists
+    const emptyState = notificationList.querySelector('.empty-notifications');
+    if (emptyState) {
+        emptyState.remove();
     }
 
-    // Theme toggle
-    if (themeToggle) {
-        themeToggle.addEventListener('click', toggleTheme);
-    }
+    // Render notifications
+    notificationList.innerHTML = sampleNotifications.map(notification => `
+        <div class="notification-item ${notification.read ? 'read' : 'unread'}" data-id="${notification.id}">
+            <div class="notification-icon">
+                <i class="${notification.icon}"></i>
+            </div>
+            <div class="notification-content">
+                <h4>${notification.title}</h4>
+                <p>${notification.message}</p>
+                <span class="notification-time">${formatTime(notification.timestamp)}</span>
+            </div>
+        </div>
+    `).join('');
 
-    // Logout button
-    if (logoutButton) {
-        logoutButton.addEventListener('click', handleLogout);
+    // Update badge count
+    const unreadCount = sampleNotifications.filter(n => !n.read).length;
+    const badge = document.querySelector('.notification-badge');
+    if (badge) {
+        badge.textContent = unreadCount;
+        badge.style.display = unreadCount > 0 ? 'flex' : 'none';
     }
 }
 
-// Initialize everything when the DOM is loaded
+// Function to format time
+function formatTime(timestamp) {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diff = now - date;
+    
+    if (diff < 60000) return 'Just now';
+    if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+    if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+    return date.toLocaleDateString();
+}
+
+// Initialize everything when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    initializeEventListeners();
-    updateActiveLink();
-});
-
-// Update profile information
-onAuthStateChanged(auth, (user) => {
-    updateProfileInfo(user);
-});
-
-// Notification Dropdown
-notificationButton.addEventListener('click', (e) => {
-    e.stopPropagation();
-    notificationDropdown.classList.toggle('show');
-    if (profileDropdown) {
-        profileDropdown.classList.remove('show');
+    console.log('DOM loaded, initializing navbar...');
+    
+    // Initialize theme
+    initializeTheme();
+    setupThemeToggle();
+    
+    // Update active nav link
+    updateActiveNavLink();
+    
+    // Handle logout
+    if (logoutButton) {
+        logoutButton.addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+                window.location.href = '/login/login.html';
+            } catch (error) {
+                console.error('Error signing out:', error);
+            }
+        });
     }
-});
-
-// Mark all notifications as read
-markAllReadButton.addEventListener('click', () => {
-    const unreadItems = document.querySelectorAll('.notification-item.unread');
-    unreadItems.forEach(item => {
-        item.classList.remove('unread');
+    
+    // Profile dropdown toggle
+    if (profileButton && profileDropdown) {
+        profileButton.addEventListener('click', () => {
+            profileDropdown.classList.toggle('show');
+        });
+    }
+    
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.notification-container')) {
+            if (notificationDropdown) {
+                notificationDropdown.classList.remove('show');
+            }
+        }
+        if (!e.target.closest('.profile-container')) {
+            if (profileDropdown) {
+                profileDropdown.classList.remove('show');
+            }
+        }
     });
-    notificationBadge.textContent = '0';
+    
+    // Notification functionality
+    if (notificationButton && notificationDropdown) {
+        notificationButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            // Toggle the dropdown
+            notificationDropdown.classList.toggle('show');
+            // Close profile dropdown if open
+            if (profileDropdown) {
+                profileDropdown.classList.remove('show');
+            }
+        });
+    }
+    
+    // Initialize notifications
+    renderNotifications();
+    
+    // Handle notification item clicks
+    document.addEventListener('click', (e) => {
+        const notificationItem = e.target.closest('.notification-item');
+        if (notificationItem) {
+            const id = parseInt(notificationItem.dataset.id);
+            const notification = sampleNotifications.find(n => n.id === id);
+            if (notification && !notification.read) {
+                notification.read = true;
+                renderNotifications();
+            }
+        }
+    });
+    
+    // Handle mark all as read
+    const markAllReadBtn = document.querySelector('.mark-all-read');
+    if (markAllReadBtn) {
+        markAllReadBtn.addEventListener('click', () => {
+            sampleNotifications.forEach(notification => {
+                notification.read = true;
+            });
+            renderNotifications();
+        });
+    }
 });
 
-// Close dropdowns when clicking outside
-document.addEventListener('click', (e) => {
-    if (!e.target.closest('.profile-container') && !e.target.closest('.notification-container')) {
-        profileDropdown.classList.remove('show');
-        notificationDropdown.classList.remove('show');
-    }
+// Listen for auth state changes
+onAuthStateChanged(auth, user => {
+    console.log('Auth state changed:', user);
+    updateProfileDisplay(user);
 }); 

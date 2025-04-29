@@ -1,5 +1,5 @@
 // Import theme configuration
-import { initializeTheme } from '../shared/theme-config.js';
+import { initializeTheme, setupThemeToggle } from '../shared/theme-config.js';
 import { auth, googleProvider } from '../firebase-config/firebase-config.js';
 import { signInWithEmailAndPassword, signInWithPopup, setPersistence, browserLocalPersistence, browserSessionPersistence } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
 
@@ -12,6 +12,7 @@ const rememberCheckbox = document.getElementById('remember');
 // Theme Toggle Functionality
 document.addEventListener('DOMContentLoaded', function() {
     initializeTheme();
+    setupThemeToggle();
 
     // Password Toggle Functionality
     const togglePassword = document.getElementById('toggle-password');

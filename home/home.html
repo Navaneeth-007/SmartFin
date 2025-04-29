@@ -10,7 +10,7 @@
     <script type="module" src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script type="module" src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
     <!-- Navigation Bar Container -->
@@ -21,12 +21,12 @@
         <!-- Header -->
         <div class="header glass-effect">
             <div class="welcome-section">
-                <h1>Welcome back, <span class="highlight" id="user-name">User</span></h1>
-                <p class="subtitle">Here's your financial overview for <span id="current-month">March 2025</span></p>
+                <h1>Welcome back, <span class="highlight" id="user-name"></span></h1>
+                <p class="subtitle">Here's your financial overview for <span id="current-month"> May 2025</span></p>
             </div>
         </div>
         
-        <!-- Key Stats -->
+        <!-- Key Stats -->  
         <div class="stats-grid">
             <div class="stat-card glass-effect">
                 <div class="stat-icon">
@@ -70,40 +70,67 @@
                 </div>
             </div>
         </div>
-        
-        <!-- Trend Graphs -->
+
+        <!-- Charts Section -->
         <div class="charts-grid">
-            <div class="chart-card glass-effect">
-                <div class="chart-header">
-                    <h3>Monthly Overview</h3>
-                    <div class="chart-actions">
-                        <button class="chart-action-btn" data-chart="monthly">
-                            <i class="fas fa-ellipsis-v"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="chart-container">
-                    <canvas id="monthlyChart"></canvas>
-                </div>
+            <div class="chart-container glass-effect">
+                <h3>Overview</h3>
+                <img src="/assets/images/overview-chart.png" alt="Financial Overview Chart" class="chart-image">
             </div>
-            
-            <div class="chart-card glass-effect">
-                <div class="chart-header">
-                    <h3>Category Breakdown</h3>
-                    <div class="chart-actions">
-                        <button class="chart-action-btn" data-chart="category">
-                            <i class="fas fa-ellipsis-v"></i>
-                        </button>
+            <div class="chart-container glass-effect">
+                <h3>Monthly Breakdown</h3>
+                <img src="/assets/images/monthly-breakdown-chart.png" alt="Monthly Breakdown Chart" class="chart-image">
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Suggestions Section -->
+    <div class="container">
+        <div class="ai-suggestions glass-effect">
+            <div class="ai-header">
+                <i class="fas fa-robot"></i>
+                <h3>AI Financial Insights</h3>
+            </div>
+            <div class="ai-content">
+                <div class="suggestion-card">
+                    <div class="suggestion-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <div class="suggestion-text">
+                        <h4>Smart Savings Tip</h4>
+                        <p>Based on your spending patterns, you could save up to ₹2,500 monthly by reducing dining out expenses by 30%.</p>
                     </div>
                 </div>
-                <div class="chart-container">
-                    <canvas id="categoryChart"></canvas>
+                <div class="suggestion-card">
+                    <div class="suggestion-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="suggestion-text">
+                        <h4>Investment Opportunity</h4>
+                        <p>Your savings rate has increased by 15% this month. Consider investing ₹5,000 in a diversified mutual fund.</p>
+                    </div>
+                </div>
+                <div class="suggestion-card">
+                    <div class="suggestion-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="suggestion-text">
+                        <h4>Spending Alert</h4>
+                        <p>Your entertainment expenses are 25% higher than last month. Consider setting a monthly budget limit.</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Scripts -->
+    <script>
+        // Debug message to check if Chart.js is loaded
+        window.addEventListener('load', function() {
+            console.log('Chart.js loaded:', typeof Chart !== 'undefined');
+        });
+    </script>
+    <script type="module" src="home.js"></script>
     <script>
         // Load navigation bar
         fetch('/components/navbar.html')
@@ -112,12 +139,12 @@
                 document.getElementById('navbar-container').innerHTML = html;
                 // Load navbar.js after the HTML is loaded
                 const script = document.createElement('script');
+                script.type = 'module';
                 script.src = '/components/navbar.js';
                 document.body.appendChild(script);
             })
             .catch(error => console.error('Error loading navigation bar:', error));
     </script>
-    <script src="home.js"></script>
 </body>
 <footer>
     <div class="footer glass-effect">
