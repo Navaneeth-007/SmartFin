@@ -207,14 +207,34 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
+    // --- IMPROVEMENT 1: Close all dropdowns on page load ---
+    document.querySelectorAll('.dropdown-menu, .notification-dropdown').forEach(drop => drop.classList.remove('show'));
+    
     // Profile dropdown toggle
     if (profileButton && profileDropdown) {
-        profileButton.addEventListener('click', () => {
+        // Remove previous event listeners if any
+        profileButton.replaceWith(profileButton.cloneNode(true));
+        const newProfileButton = document.querySelector('.profile-button');
+        newProfileButton.addEventListener('click', () => {
             profileDropdown.classList.toggle('show');
+        });
+
+        // --- IMPROVEMENT 2: Close dropdown on any dropdown-item click (with delay) ---
+        const dropdownItems = profileDropdown.querySelectorAll('.dropdown-item[href]');
+        dropdownItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                profileDropdown.classList.remove('show');
+                // Add a small delay before navigation for visual feedback
+                const href = item.getAttribute('href');
+                if (href && href !== '#') {
+                    e.preventDefault();
+                    setTimeout(() => { window.location.href = href; }, 120);
+                }
+            });
         });
     }
     
-    // Close dropdowns when clicking outside
+    // --- IMPROVEMENT 4: Robust close on outside click ---
     document.addEventListener('click', (e) => {
         if (!e.target.closest('.notification-container')) {
             if (notificationDropdown) {

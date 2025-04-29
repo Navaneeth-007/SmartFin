@@ -8,6 +8,8 @@ const uploadArea = document.getElementById('upload-area');
 const expenseTableBody = document.getElementById('expense-table-body');
 const monthSelect = document.getElementById('month-select');
 const yearSelect = document.getElementById('year-select');
+const categoryBreakdownModal = document.getElementById('category-breakdown-modal');
+const viewCategoryDetailsBtn = document.getElementById('view-category-details');
 
 // Sample expense data
 const sampleExpenses = [
@@ -129,6 +131,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Display sample expenses
     displaySampleExpenses();
+
+    // Category Breakdown Modal logic
+    if (viewCategoryDetailsBtn && categoryBreakdownModal) {
+        viewCategoryDetailsBtn.addEventListener('click', () => openModal(categoryBreakdownModal));
+    }
+    // Add close logic for the new modal
+    if (categoryBreakdownModal) {
+        const closeBtn = categoryBreakdownModal.querySelector('.close-modal');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => closeModal(categoryBreakdownModal));
+        }
+    }
 });
 
 // Initialize date selectors
@@ -231,6 +245,9 @@ window.addEventListener('click', (event) => {
     }
     if (event.target === billUploadModal) {
         closeModal(billUploadModal);
+    }
+    if (event.target === categoryBreakdownModal) {
+        closeModal(categoryBreakdownModal);
     }
 });
 

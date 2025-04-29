@@ -74,6 +74,18 @@
             </div>
         </div>
         
+        <!-- Income Overview Graphs Section -->
+        <div class="charts-grid">
+            <div class="chart-container glass-effect">
+                <h3>Income Trend</h3>
+                <img src="/assets/images/income-trend-chart.svg" alt="Income Trend Chart" class="chart-image">
+            </div>
+            <div class="chart-container glass-effect">
+                <h3>Source Distribution</h3>
+                <img src="/assets/images/income-source-chart.svg" alt="Income Source Chart" class="chart-image">
+            </div>
+        </div>
+        
         <!-- Add Income Button -->
         <div class="add-income-container glass-effect">
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addIncomeModal">
@@ -173,6 +185,7 @@
             .then(html => {
                 document.getElementById('navbar-container').innerHTML = html;
                 const script = document.createElement('script');
+                script.type = 'module';
                 script.src = '/components/navbar.js';
                 document.body.appendChild(script);
             });
