@@ -1,24 +1,11 @@
 // Import theme configuration
 import { initializeTheme } from '../shared/theme-config.js';
-
-// Initialize Firebase
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js';
-import { getAuth, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
-
-// Your web app's Firebase configuration
-const firebaseConfig = {
-    apiKey: "AIzaSyBPyEBGDaOFeWNI7HnYmRe1XMjWVX_LIL0",
-    authDomain: "smartfin-5c89b.firebaseapp.com",
-    projectId: "smartfin-5c89b",
-    storageBucket: "smartfin-5c89b.appspot.com",
-    messagingSenderId: "378095667140",
-    appId: "1:378095667140:web:a08fae7cc6e83f0c3a1b84"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const googleProvider = new GoogleAuthProvider();
+import { auth, googleProvider } from '../firebase-config/firebase-config.js';
+import { 
+    createUserWithEmailAndPassword, 
+    signInWithPopup,
+    updateProfile 
+} from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
 
 // DOM Elements
 const signupForm = document.getElementById('signup-form');
@@ -48,9 +35,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Password Toggle Functionality
     const togglePassword = document.getElementById('toggle-password');
-    const passwordInput = document.getElementById('password');
     const toggleConfirmPassword = document.getElementById('toggle-confirm-password');
-    const confirmPasswordInput = document.getElementById('confirm-password');
     
     // Password field toggle
     if (togglePassword && passwordInput) {
@@ -110,8 +95,10 @@ function clearError(elementId) {
 signupForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    const name = `${firstnameInput.value} ${lastnameInput.value}`;
-    const email = emailInput.value;
+    const firstname = firstnameInput.value.trim();
+    const lastname = lastnameInput.value.trim();
+    const name = `${firstname} ${lastname}`;
+    const email = emailInput.value.trim();
     const password = passwordInput.value;
     const confirmPassword = confirmPasswordInput.value;
     const terms = termsCheckbox.checked;
@@ -125,8 +112,13 @@ signupForm.addEventListener('submit', async (e) => {
     clearError('confirm-password');
     
     // Validate form
-    if (!name.trim()) {
-        showError('firstname', 'Name is required');
+    if (!firstname) {
+        showError('firstname', 'First name is required');
+        return;
+    }
+
+    if (!lastname) {
+        showError('lastname', 'Last name is required');
         return;
     }
     
@@ -144,24 +136,13 @@ signupForm.addEventListener('submit', async (e) => {
         console.log('Attempting to create user with email:', email);
         
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-        console.log('User created successfully:', user.uid);
+        console.log('User created successfully:', userCredential.user);
         
         // Update user profile
-        await user.updateProfile({
-            displayName: name,
-            photoURL: null // You can add a default avatar URL here
+        await updateProfile(userCredential.user, {
+            displayName: name
         });
         console.log('User profile updated successfully');
-        
-        // Store additional user data in Firestore (if you're using it)
-        // await firebase.firestore().collection('users').doc(user.uid).set({
-        //     firstname: firstnameInput.value,
-        //     lastname: lastnameInput.value,
-        //     email: emailInput.value,
-        //     phone: phoneInput.value,
-        //     createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        // });
         
         // Redirect to home page
         window.location.href = '../home/home.html';
@@ -184,12 +165,19 @@ signupForm.addEventListener('submit', async (e) => {
 });
 
 // Handle Google Sign Up
-googleSignUpButton.addEventListener('click', async () => {
+document.getElementById('google-signup').addEventListener('click', async () => {
     try {
-        console.log('Attempting Google sign up');
+        // Clear any existing errors
+        clearError('firstname');
+        clearError('lastname');
+        clearError('email');
+        clearError('phone');
+        clearError('password');
+        clearError('confirm-password');
+        
+        console.log('Attempting Google sign up...');
         const result = await signInWithPopup(auth, googleProvider);
-        const user = result.user;
-        console.log('Google sign up successful:', user.uid);
+        console.log('Google sign up successful:', result.user);
         
         // Redirect to home page
         window.location.href = '../home/home.html';
@@ -197,6 +185,8 @@ googleSignUpButton.addEventListener('click', async () => {
         console.error('Google sign up error:', error);
         if (error.code === 'auth/popup-closed-by-user') {
             showError('email', 'Sign up cancelled');
+        } else if (error.code === 'auth/popup-blocked') {
+            showError('email', 'Pop-up blocked by browser. Please allow pop-ups for this site');
         } else {
             showError('email', 'Could not sign up with Google. Please try again');
         }
