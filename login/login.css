@@ -1,11 +1,216 @@
 @import url('/shared/theme.css');
 
+:root {
+    --primary-color: #6366F1;
+    --primary-gradient: linear-gradient(90deg, #6366F1 0%, #A855F7 100%);
+    --accent-color: #06B6D4;
+    --accent-gradient: linear-gradient(90deg, #F59E42 0%, #F43F5E 100%);
+    --background-primary: #f8fafc;
+    --background-secondary: #e0e7ef;
+    --glass-background: rgba(255,255,255,0.85);
+    --glass-border: rgba(99,102,241,0.15);
+    --text-primary: #18181b;
+    --text-secondary: #6366f1;
+    --border-color: #e5e7eb;
+    --shadow-color: rgba(99,102,241,0.08);
+    --hover-color: rgba(99,102,241,0.08);
+    --transition-speed: 0.3s;
+}
+
+/* Dark Theme Variables */
+[data-theme="dark"] {
+    --primary-color: #A855F7;
+    --primary-gradient: linear-gradient(90deg, #A855F7 0%, #6366F1 100%);
+    --accent-color: #06B6D4;
+    --accent-gradient: linear-gradient(90deg, #F43F5E 0%, #F59E42 100%);
+    --background-primary: #18181b;
+    --background-secondary: #232336;
+    --glass-background: rgba(24,24,27,0.85);
+    --glass-border: rgba(168,85,247,0.15);
+    --text-primary: #f3f4f6;
+    --text-secondary: #a855f7;
+    --border-color: #232336;
+    --shadow-color: rgba(168,85,247,0.12);
+    --hover-color: rgba(168,85,247,0.08);
+}
+
 body {
+    margin: 0;
+    padding: 0;
     min-height: 100vh;
     background: var(--background-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+.auth-container {
+    width: 100%;
+    max-width: 400px;
+    padding: 2rem;
+}
+
+.auth-card {
+    background: var(--glass-background);
+    border: 1px solid var(--glass-border);
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 4px 24px var(--shadow-color);
+    backdrop-filter: blur(10px);
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.auth-header h1 {
+    font-size: 2rem;
     color: var(--text-primary);
-    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
-    transition: background var(--transition-speed), color var(--transition-speed);
+    margin: 0 0 0.5rem 0;
+}
+
+.auth-header p {
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-group i {
+    position: absolute;
+    left: 1rem;
+    color: var(--text-secondary);
+}
+
+.input-group input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    background: var(--background-primary);
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: all var(--transition-speed);
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px var(--hover-color);
+}
+
+.toggle-password {
+    position: absolute;
+    right: 1rem;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0;
+}
+
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.remember-me input[type="checkbox"] {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 0.25rem;
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+}
+
+.forgot-password {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: color var(--transition-speed);
+}
+
+.forgot-password:hover {
+    color: var(--accent-color);
+}
+
+.auth-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: var(--primary-gradient);
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-speed);
+}
+
+.auth-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: 2rem;
+    color: var(--text-secondary);
+}
+
+.auth-footer a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color var(--transition-speed);
+}
+
+.auth-footer a:hover {
+    color: var(--accent-color);
+}
+
+@media (max-width: 480px) {
+    .auth-container {
+        padding: 1rem;
+    }
+    
+    .auth-card {
+        padding: 1.5rem;
+    }
 }
 
 .login-grid {

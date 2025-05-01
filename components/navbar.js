@@ -1,7 +1,7 @@
 // Import Firebase modules
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js';
 import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js';
-import { initializeTheme, setupThemeToggle } from '../shared/theme-config.js';
+import { initializeThemeManager, setupThemeToggle } from '../shared/theme-manager.js';
 
 // Initialize Firebase
 const firebaseConfig = {
@@ -188,8 +188,8 @@ function formatTime(timestamp) {
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded, initializing navbar...');
     
-    // Initialize theme
-    initializeTheme();
+    // Initialize theme manager
+    initializeThemeManager();
     setupThemeToggle();
     
     // Update active nav link

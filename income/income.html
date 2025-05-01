@@ -74,6 +74,13 @@
             </div>
         </div>
         
+        <!-- Add Income Button -->
+        <div class="action-buttons glass-effect">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addIncomeModal">
+                <i class="fas fa-plus"></i> Add New Income
+            </button>
+        </div>
+        
         <!-- Income Overview Graphs Section -->
         <div class="charts-grid">
             <div class="chart-container glass-effect">
@@ -86,19 +93,57 @@
             </div>
         </div>
         
-        <!-- Add Income Button -->
-        <div class="add-income-container glass-effect">
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addIncomeModal">
-                <i class="fas fa-plus"></i> Add New Income
-            </button>
+        <!-- AI Income Insights Container -->
+        <div class="ai-suggestions-container glass-effect">
+            <div class="ai-suggestions-header">
+                <i class="fas fa-robot text-emerald-500"></i>
+                <h3 class="text-lg font-semibold">AI Income Insights</h3>
+            </div>
+            <div class="ai-suggestions-content">
+                <div class="suggestion-item">
+                    <div class="suggestion-icon">
+                        <i class="fas fa-chart-line-up text-emerald-500"></i>
+                    </div>
+                    <div class="suggestion-text">
+                        <h4 class="font-medium">Income Growth Opportunity</h4>
+                        <p>Your freelance income has potential to grow by 25% if you increase your rates by 15%.</p>
+                    </div>
+                </div>
+                <div class="suggestion-item">
+                    <div class="suggestion-icon">
+                        <i class="fas fa-hand-holding-usd text-yellow-500"></i>
+                    </div>
+                    <div class="suggestion-text">
+                        <h4 class="font-medium">Investment Potential</h4>
+                        <p>You could invest 30% of your monthly income to achieve your financial goals faster.</p>
+                    </div>
+                </div>
+                <div class="suggestion-item">
+                    <div class="suggestion-icon">
+                        <i class="fas fa-briefcase text-blue-500"></i>
+                    </div>
+                    <div class="suggestion-text">
+                        <h4 class="font-medium">Career Advancement</h4>
+                        <p>Consider upskilling to increase your salary by up to ₹10,000 monthly.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="ai-suggestions-footer">
+                <button class="refresh-suggestions">
+                    <i class="fas fa-sync-alt"></i>
+                    Refresh Suggestions
+                </button>
+            </div>
         </div>
-        
-        <!-- Income List -->
+    </div>
+
+    <!-- Income List (moved to bottom) -->
+    <div class="container">
         <div class="income-list glass-effect">
-            <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="income-list-header">
                 <h2>Recent Income</h2>
-                <div class="date-selectors">
-                    <select id="month-select" class="form-select me-2">
+                <div class="date-filter">
+                    <select id="month-select" class="form-control">
                         <option value="0">January</option>
                         <option value="1">February</option>
                         <option value="2">March</option>
@@ -112,7 +157,7 @@
                         <option value="10">November</option>
                         <option value="11">December</option>
                     </select>
-                    <select id="year-select" class="form-select">
+                    <select id="year-select" class="form-control">
                         <!-- Years will be populated dynamically -->
                     </select>
                 </div>
@@ -135,44 +180,38 @@
     </div>
 
     <!-- Add Income Modal -->
-    <div class="modal fade" id="addIncomeModal" tabindex="-1" aria-labelledby="addIncomeModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content glass-effect">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addIncomeModalLabel">Add New Income</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div id="add-income-modal" class="modal">
+        <div class="modal-content glass-effect">
+            <span class="close-modal">&times;</span>
+            <h2>Add New Income</h2>
+            <form id="income-form">
+                <div class="form-group">
+                    <label for="income-source">Income Source</label>
+                    <input type="text" id="income-source" class="form-control" required>
                 </div>
-                <div class="modal-body">
-                    <form id="income-form">
-                        <div class="form-group">
-                            <label for="income-source">Income Source</label>
-                            <input type="text" id="income-source" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="income-amount">Amount</label>
-                            <input type="number" id="income-amount" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="income-date">Date</label>
-                            <input type="date" id="income-date" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="income-category">Category</label>
-                            <select id="income-category" class="form-control" required>
-                                <option value="">Select Category</option>
-                                <option value="salary">Salary</option>
-                                <option value="freelance">Freelance</option>
-                                <option value="investment">Investment</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-                    </form>
+                <div class="form-group">
+                    <label for="income-amount">Amount</label>
+                    <input type="number" id="income-amount" class="form-control" required>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" onclick="handleIncomeSubmit()">Add Income</button>
+                <div class="form-group">
+                    <label for="income-date">Date</label>
+                    <input type="date" id="income-date" class="form-control" required>
                 </div>
-            </div>
+                <div class="form-group">
+                    <label for="income-category">Category</label>
+                    <select id="income-category" class="form-control" required>
+                        <option value="">Select Category</option>
+                        <option value="salary">Salary</option>
+                        <option value="freelance">Freelance</option>
+                        <option value="investment">Investment</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Income</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -191,6 +230,76 @@
             });
     </script>
     <script src="income.js"></script>
+    <script>
+        // AI Suggestions functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.querySelector('.ai-suggestions-container');
+            const refreshButton = container.querySelector('.refresh-suggestions');
+            const content = container.querySelector('.ai-suggestions-content');
+
+            const generateSuggestions = () => {
+                const categories = [
+                    { icon: 'fa-chart-line-up', color: 'text-emerald-500', title: 'Income Growth' },
+                    { icon: 'fa-hand-holding-usd', color: 'text-yellow-500', title: 'Investment' },
+                    { icon: 'fa-briefcase', color: 'text-blue-500', title: 'Career' },
+                    { icon: 'fa-piggy-bank', color: 'text-purple-500', title: 'Savings' },
+                    { icon: 'fa-chart-pie', color: 'text-orange-500', title: 'Diversification' },
+                    { icon: 'fa-lightbulb', color: 'text-red-500', title: 'Opportunity' }
+                ];
+
+                const messages = [
+                    'Your income in this category has potential to grow by 25% this year.',
+                    'Consider diversifying your income sources to increase stability.',
+                    'This income source shows consistent growth potential.',
+                    'You could optimize your earnings by 15% with small changes.',
+                    'Your income pattern suggests opportunities for passive income.',
+                    'This category shows potential for significant growth.'
+                ];
+
+                const actions = [
+                    'Increase rates by 15%',
+                    'Diversify income sources',
+                    'Invest in upskilling',
+                    'Create passive income streams',
+                    'Optimize your work schedule',
+                    'Leverage your expertise'
+                ];
+
+                content.innerHTML = '';
+
+                for (let i = 0; i < 3; i++) {
+                    const category = categories[Math.floor(Math.random() * categories.length)];
+                    const message = messages[Math.floor(Math.random() * messages.length)];
+                    const action = actions[Math.floor(Math.random() * actions.length)];
+
+                    const suggestion = document.createElement('div');
+                    suggestion.className = 'suggestion-item';
+                    suggestion.innerHTML = `
+                        <div class="suggestion-icon">
+                            <i class="fas ${category.icon} ${category.color}"></i>
+                        </div>
+                        <div class="suggestion-text">
+                            <h4 class="font-medium">${category.title}</h4>
+                            <p>${message} ${action}.</p>
+                        </div>
+                    `;
+
+                    content.appendChild(suggestion);
+                }
+            };
+
+            generateSuggestions();
+
+            refreshButton.addEventListener('click', () => {
+                refreshButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing...';
+                
+                setTimeout(() => {
+                    generateSuggestions();
+                    refreshButton.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Suggestions';
+                }, 1000);
+            });
+        });
+    </script>
 </body>
 <footer>
     <div class="footer glass-effect">

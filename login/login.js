@@ -3,11 +3,15 @@ import { initializeTheme, setupThemeToggle } from '../shared/theme-config.js';
 import { auth, googleProvider } from '../firebase-config/firebase-config.js';
 import { signInWithEmailAndPassword, signInWithPopup, setPersistence, browserLocalPersistence, browserSessionPersistence } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
 
+// Initialize Firebase
+const auth = firebase.auth();
+
 // DOM Elements
-const loginForm = document.getElementById('login-form');
+const loginForm = document.getElementById('loginForm');
 const emailInput = document.getElementById('email');
 const passwordInput = document.getElementById('password');
-const rememberCheckbox = document.getElementById('remember');
+const rememberMe = document.getElementById('rememberMe');
+const togglePassword = document.querySelector('.toggle-password');
 
 // Theme Toggle Functionality
 document.addEventListener('DOMContentLoaded', function() {
@@ -15,8 +19,6 @@ document.addEventListener('DOMContentLoaded', function() {
     setupThemeToggle();
 
     // Password Toggle Functionality
-    const togglePassword = document.getElementById('toggle-password');
-    
     if (togglePassword && passwordInput) {
         togglePassword.addEventListener('click', function() {
             const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
@@ -63,46 +65,56 @@ loginForm.addEventListener('submit', async (e) => {
     
     const email = emailInput.value;
     const password = passwordInput.value;
-    const rememberMe = rememberCheckbox.checked;
-    
-    // Clear any existing errors
-    clearError('email');
-    clearError('password');
     
     try {
+        // Show loading state
+        const submitButton = loginForm.querySelector('button[type="submit"]');
+        const originalText = submitButton.innerHTML;
+        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
+        submitButton.disabled = true;
+        
+        // Sign in with email and password
+        const userCredential = await auth.signInWithEmailAndPassword(email, password);
+        
         // Set persistence based on remember me checkbox
-        await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
+        const persistence = rememberMe.checked ? 
+            firebase.auth.Auth.Persistence.LOCAL : 
+            firebase.auth.Auth.Persistence.SESSION;
         
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        console.log('User logged in successfully:', userCredential.user);
+        await auth.setPersistence(persistence);
         
-        // Save email if remember me is checked
-        if (rememberMe) {
-            localStorage.setItem('rememberedEmail', email);
-        } else {
-            localStorage.removeItem('rememberedEmail');
-        }
+        // Redirect to dashboard
+        window.location.href = '../dashboard';
         
-        // Redirect to home page
-        window.location.href = '../home/home.html';
     } catch (error) {
-        console.error('Login error:', error);
+        // Reset button state
+        const submitButton = loginForm.querySelector('button[type="submit"]');
+        submitButton.innerHTML = originalText;
+        submitButton.disabled = false;
+        
+        // Handle errors
+        let errorMessage = 'An error occurred during sign in.';
+        
         switch (error.code) {
             case 'auth/invalid-email':
-                showError('email', 'Invalid email address');
+                errorMessage = 'Invalid email address.';
+                break;
+            case 'auth/user-disabled':
+                errorMessage = 'This account has been disabled.';
                 break;
             case 'auth/user-not-found':
-                showError('email', 'No account found with this email');
+                errorMessage = 'No account found with this email.';
                 break;
             case 'auth/wrong-password':
-                showError('password', 'Incorrect password');
+                errorMessage = 'Incorrect password.';
                 break;
             case 'auth/too-many-requests':
-                showError('password', 'Too many failed attempts. Please try again later');
+                errorMessage = 'Too many failed attempts. Please try again later.';
                 break;
-            default:
-                showError('email', 'An error occurred. Please try again');
         }
+        
+        // Show error message
+        alert(errorMessage);
     }
 });
 
@@ -136,7 +148,7 @@ window.addEventListener('load', () => {
     const rememberedEmail = localStorage.getItem('rememberedEmail');
     if (rememberedEmail) {
         emailInput.value = rememberedEmail;
-        rememberCheckbox.checked = true;
+        rememberMe.checked = true;
     }
 });
 
@@ -188,5 +200,13 @@ passwordInput.addEventListener('input', () => {
         passwordError.textContent = 'Password must be at least 8 characters with 1 uppercase, 1 lowercase, and 1 number';
     } else {
         passwordError.textContent = '';
+    }
+});
+
+// Check if user is already logged in
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        // User is signed in, redirect to dashboard
+        window.location.href = '../dashboard';
     }
 }); 
