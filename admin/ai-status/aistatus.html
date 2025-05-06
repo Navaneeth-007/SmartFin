@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
+    <title>SmartFin - AI System Status</title>
+    <link rel="stylesheet" href="/shared/theme.css">
+    <link rel="stylesheet" href="aistatus.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <!-- Firebase SDK -->
+    <script type="module" src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar glass-effect">
+            <div class="sidebar-header">
+                <div class="brand-logo">
+                    <i class="fas fa-user-shield"></i>
+                    <span>SmartFin Admin</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="../dashboard/dashboard.html" class="nav-item" data-section="users">
+                    <i class="fas fa-users"></i>
+                    <span>User Management</span>
+                </a>
+                <a href="index.html" class="nav-item active" data-section="ai">
+                    <i class="fas fa-robot"></i>
+                    <span>AI Status</span>
+                </a>
+                <a href="../dashboard.html" class="nav-item" data-section="analytics">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Analytics</span>
+                </a>
+                <a href="../dashboard.html" class="nav-item" data-section="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="logoutBtn" class="btn btn-secondary w-100">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header glass-effect">
+                <div class="header-left">
+                    <h1>AI System Status</h1>
+                    <p class="welcome-message">Real-time monitoring and diagnostics</p>
+                </div>
+                <div class="header-right">
+                    <div class="theme-toggle" id="theme-toggle" title="Toggle theme">
+                        <i class="fas fa-sun light-icon"></i>
+                        <i class="fas fa-moon dark-icon"></i>
+                    </div>
+                </div>
+            </header>
+
+            <!-- AI Status Content -->
+            <div class="dashboard-content">
+                <!-- System Overview -->
+                <section class="ai-overview glass-effect">
+                    <div class="section-header">
+                        <h2>System Overview</h2>
+                        <div class="system-status">
+                            <span class="status-indicator online"></span>
+                            <span class="status-text">All Systems Operational</span>
+                        </div>
+                    </div>
+                    <div class="metrics-grid">
+                        <div class="metric-card glass-effect">
+                            <div class="metric-icon">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <div class="metric-info">
+                                <h3>Model Status</h3>
+                                <p class="metric-value">Active</p>
+                                <p class="metric-detail">Last updated: 2 minutes ago</p>
+                            </div>
+                        </div>
+                        <div class="metric-card glass-effect">
+                            <div class="metric-icon">
+                                <i class="fas fa-tachometer-alt"></i>
+                            </div>
+                            <div class="metric-info">
+                                <h3>Response Time</h3>
+                                <p class="metric-value">0.5s</p>
+                                <p class="metric-detail">Average over last hour</p>
+                            </div>
+                        </div>
+                        <div class="metric-card glass-effect">
+                            <div class="metric-icon">
+                                <i class="fas fa-memory"></i>
+                            </div>
+                            <div class="metric-info">
+                                <h3>Memory Usage</h3>
+                                <p class="metric-value">45%</p>
+                                <p class="metric-detail">2.3GB / 5GB</p>
+                            </div>
+                        </div>
+                        <div class="metric-card glass-effect">
+                            <div class="metric-icon">
+                                <i class="fas fa-server"></i>
+                            </div>
+                            <div class="metric-info">
+                                <h3>API Status</h3>
+                                <p class="metric-value">Healthy</p>
+                                <p class="metric-detail">99.9% uptime</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Performance Metrics -->
+                <section class="performance-metrics glass-effect">
+                    <div class="section-header">
+                        <h2>Performance Metrics</h2>
+                        <div class="time-range">
+                            <select id="timeRange" class="form-control">
+                                <option value="1h">Last Hour</option>
+                                <option value="24h">Last 24 Hours</option>
+                                <option value="7d">Last 7 Days</option>
+                                <option value="30d">Last 30 Days</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="charts-grid">
+                        <div class="chart-container glass-effect">
+                            <h3>Response Time Trend</h3>
+                            <canvas id="responseTimeChart"></canvas>
+                        </div>
+                        <div class="chart-container glass-effect">
+                            <h3>Memory Usage Trend</h3>
+                            <canvas id="memoryUsageChart"></canvas>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Model Health -->
+                <section class="model-health glass-effect">
+                    <div class="section-header">
+                        <h2>Model Health</h2>
+                        <button class="btn btn-primary" id="refreshModels">
+                            <i class="fas fa-sync"></i>
+                            Refresh Status
+                        </button>
+                    </div>
+                    <div class="models-grid">
+                        <div class="model-card glass-effect">
+                            <div class="model-header">
+                                <h3>GPT-4 Model</h3>
+                                <span class="status-badge online">Active</span>
+                            </div>
+                            <div class="model-metrics">
+                                <div class="metric">
+                                    <span class="label">Version</span>
+                                    <span class="value">4.0.1</span>
+                                </div>
+                                <div class="metric">
+                                    <span class="label">Last Updated</span>
+                                    <span class="value">2024-03-15</span>
+                                </div>
+                                <div class="metric">
+                                    <span class="label">Accuracy</span>
+                                    <span class="value">98.5%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="model-card glass-effect">
+                            <div class="model-header">
+                                <h3>Financial Analysis Model</h3>
+                                <span class="status-badge online">Active</span>
+                            </div>
+                            <div class="model-metrics">
+                                <div class="metric">
+                                    <span class="label">Version</span>
+                                    <span class="value">2.3.0</span>
+                                </div>
+                                <div class="metric">
+                                    <span class="label">Last Updated</span>
+                                    <span class="value">2024-03-10</span>
+                                </div>
+                                <div class="metric">
+                                    <span class="label">Accuracy</span>
+                                    <span class="value">96.8%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Recent Alerts -->
+                <section class="recent-alerts glass-effect">
+                    <div class="section-header">
+                        <h2>Recent Alerts</h2>
+                        <button class="btn btn-secondary" id="viewAllAlerts">
+                            View All
+                        </button>
+                    </div>
+                    <div class="alerts-list">
+                        <div class="alert-item">
+                            <div class="alert-icon info">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <div class="alert-content">
+                                <h4>System Update Available</h4>
+                                <p>New model version 4.0.2 is ready for deployment</p>
+                                <span class="alert-time">2 hours ago</span>
+                            </div>
+                        </div>
+                        <div class="alert-item">
+                            <div class="alert-icon warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="alert-content">
+                                <h4>High Memory Usage</h4>
+                                <p>Memory usage exceeded 80% threshold</p>
+                                <span class="alert-time">5 hours ago</span>
+                            </div>
+                        </div>
+                        <div class="alert-item">
+                            <div class="alert-icon success">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="alert-content">
+                                <h4>Backup Completed</h4>
+                                <p>System backup completed successfully</p>
+                                <span class="alert-time">1 day ago</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer glass-effect">
+            <p>&copy; Developed by Navaneeth</p>
+        </div>
+    </footer>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html> 

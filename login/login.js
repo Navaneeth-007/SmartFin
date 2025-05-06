@@ -3,14 +3,11 @@ import { initializeTheme, setupThemeToggle } from '../shared/theme-config.js';
 import { auth, googleProvider } from '../firebase-config/firebase-config.js';
 import { signInWithEmailAndPassword, signInWithPopup, setPersistence, browserLocalPersistence, browserSessionPersistence } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
 
-// Initialize Firebase
-const auth = firebase.auth();
-
 // DOM Elements
-const loginForm = document.getElementById('loginForm');
+const loginForm = document.getElementById('login-form');
 const emailInput = document.getElementById('email');
 const passwordInput = document.getElementById('password');
-const rememberMe = document.getElementById('rememberMe');
+const rememberMe = document.getElementById('remember-me');
 const togglePassword = document.querySelector('.toggle-password');
 
 // Theme Toggle Functionality
@@ -28,6 +25,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const icon = this.querySelector('i');
             icon.classList.toggle('fa-eye');
             icon.classList.toggle('fa-eye-slash');
+        });
+    }
+
+    // Admin login button handler
+    const adminLoginBtn = document.getElementById('admin-login');
+    if (adminLoginBtn) {
+        adminLoginBtn.addEventListener('click', () => {
+            window.location.href = '../admin/login/login.html';
         });
     }
 });
