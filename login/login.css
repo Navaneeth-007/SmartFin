@@ -136,16 +136,6 @@ body {
     cursor: pointer;
 }
 
-.forgot-password {
-    color: var(--primary-color);
-    text-decoration: none;
-    transition: color var(--transition-speed);
-}
-
-.forgot-password:hover {
-    color: var(--accent-color);
-}
-
 .auth-button {
     display: flex;
     align-items: center;
@@ -385,16 +375,6 @@ body {
     gap: 0.4rem;
     color: var(--text-secondary);
     font-weight: 500;
-}
-.forgot-password {
-    color: var(--accent-color);
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.2s;
-}
-.forgot-password:hover {
-    color: var(--primary-color);
-    text-decoration: underline;
 }
 
 .btn-primary, .btn-google, .btn-signup {
