@@ -3,6 +3,7 @@
 
 <nav class="navbar">
     <div class="nav-container">
+        <!-- Left: Logo & Links -->
         <div class="nav-left">
             <a href="/home/home.html" class="logo">
                 <i class="fas fa-wallet"></i>
@@ -23,7 +24,10 @@
                 </a>
             </div>
         </div>
+
+        <!-- Right: Notifications & Profile Button -->
         <div class="nav-right">
+            <!-- Notifications -->
             <div class="notification-container">
                 <button class="notification-button" aria-label="Notifications">
                     <i class="fas fa-bell"></i>
@@ -39,43 +43,16 @@
                             <i class="fas fa-bell-slash"></i>
                             <p>No notifications yet</p>
                         </div>
-                        <!-- Notification items will be dynamically added here -->
+                        <!-- Notifications are injected here -->
                     </div>
                 </div>
             </div>
-            <div class="profile-container">
-                <div class="profile-dropdown">
-                    <button class="profile-button">
-                        <div class="profile-avatar">
-                            <img src="" alt="Profile" class="profile-image" style="display: none;">
-                            <span class="profile-initial" style="display: none;">A</span>
-                        </div>
-                        <span class="profile-name">Guest</span>
-                    </button>
-                    <div class="dropdown-menu">
-                        <div class="dropdown-header">
-                            <div class="dropdown-profile-avatar">
-                                <img src="" alt="Profile" class="dropdown-profile-image" style="display: none;">
-                                <span class="dropdown-profile-initial" style="display: none;">A</span>
-                            </div>
-                            <div class="dropdown-user-info">
-                                <span class="dropdown-username">Guest</span>
-                                <span class="dropdown-email">guest@example.com</span>
-                            </div>
-                        </div>
-                        <div class="dropdown-divider"></div>
-                        <a href="/profile/profile.html" class="dropdown-item">
-                            <i class="fas fa-user"></i>
-                            <span>Profile</span>
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <button class="dropdown-item" id="logout-button">
-                            <i class="fas fa-sign-out-alt"></i>
-                            <span>Logout</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
+
+            <!-- Profile Nav Button -->
+            <a href="/profile/profile.html" style="text-decoration: none;" class="profile-nav-btn" id="profile-nav-btn">
+                <i class="fas fa-user"></i>
+                <span class="profile-name">Profile</span>
+            </a>
         </div>
     </div>
-</nav> 
+</nav>
