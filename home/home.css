@@ -347,3 +347,22 @@ body {
     margin-bottom: 1.5rem;
     animation: fadeIn 1.2s;
 }
+
+:root {
+    --primary-color: #6366F1;
+    --primary-gradient: linear-gradient(90deg, #6366F1 0%, #A855F7 100%);
+    --accent-color: #06B6D4;
+    --accent-gradient: linear-gradient(90deg, #F59E42 0%, #F43F5E 100%);
+    --background-primary: #f8fafc;
+    --background-secondary: #e0e7ef;
+    --glass-background: rgba(255,255,255,0.85);
+    --glass-border: rgba(99,102,241,0.15);
+    --text-primary: #18181b;
+    --text-secondary: #6366f1;
+    --border-color: #e5e7eb;
+    --shadow-color: rgba(99,102,241,0.08);
+    --hover-color: rgba(99,102,241,0.08);
+    --transition-speed: 0.3s;
+}
+
+/* Use glass-effect, button, card, and grid styles from income.css/dashboard.css for consistency. */

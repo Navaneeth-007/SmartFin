@@ -1,91 +1,12 @@
-// DOM Elements
-const incomeForm = document.getElementById('income-form');
+// Replace all sample/demo logic with backend integration
+const user_id = 'PLACEHOLDER_USER_ID'; // TODO: Replace with real user id
 const incomeTableBody = document.getElementById('income-table-body');
 const monthSelect = document.getElementById('month-select');
 const yearSelect = document.getElementById('year-select');
-let addIncomeModal = null;
+const incomeForm = document.getElementById('income-form');
+const incomeModal = document.getElementById('add-income-modal');
 
-// Sample income data
-const sampleIncomes = [
-    {
-        date: '2025-05-15',
-        source: 'Monthly Salary',
-        category: 'Salary',
-        amount: 30000
-    },
-    {
-        date: '2025-05-10',
-        source: 'Freelance Project',
-        category: 'Freelance',
-        amount: 8000
-    },
-    {
-        date: '2025-05-05',
-        source: 'Stock Dividends',
-        category: 'Investment',
-        amount: 2500
-    },
-    {
-        date: '2025-04-25',
-        source: 'Monthly Salary',
-        category: 'Salary',
-        amount: 30000
-    },
-    {
-        date: '2025-04-20',
-        source: 'Part-time Job',
-        category: 'Other',
-        amount: 5000
-    },
-    {
-        date: '2025-04-15',
-        source: 'Freelance Project',
-        category: 'Freelance',
-        amount: 6000
-    },
-    {
-        date: '2025-04-10',
-        source: 'Interest Income',
-        category: 'Investment',
-        amount: 1500
-    },
-    {
-        date: '2025-04-05',
-        source: 'Consulting Work',
-        category: 'Freelance',
-        amount: 4000
-    }
-];
-
-// Event Listeners
-document.addEventListener('DOMContentLoaded', () => {
-    // Initialize date selectors
-    initializeDateSelectors();
-
-    // Display sample incomes
-    displaySampleIncomes();
-
-    // Initialize modal
-    addIncomeModal = new bootstrap.Modal(document.getElementById('addIncomeModal'));
-
-    // Handle form submission
-    if (incomeForm) {
-        incomeForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            handleIncomeSubmit();
-        });
-    }
-
-    // Handle month/year selection changes
-    if (monthSelect) {
-        monthSelect.addEventListener('change', displaySampleIncomes);
-    }
-    if (yearSelect) {
-        yearSelect.addEventListener('change', displaySampleIncomes);
-    }
-});
-
-// Initialize date selectors
+// Initialize month and year selectors
 function initializeDateSelectors() {
     const currentDate = new Date();
     const currentYear = currentDate.getFullYear();
@@ -93,6 +14,7 @@ function initializeDateSelectors() {
     // Set current month
     if (monthSelect) {
         monthSelect.value = currentDate.getMonth();
+        monthSelect.addEventListener('change', fetchAndDisplayIncomes);
     }
     
     // Clear existing options
@@ -109,117 +31,86 @@ function initializeDateSelectors() {
         
         // Set current year
         yearSelect.value = currentYear;
+        yearSelect.addEventListener('change', fetchAndDisplayIncomes);
     }
 }
 
-// Display sample incomes in the table
-function displaySampleIncomes() {
+// Fetch and display incomes
+async function fetchAndDisplayIncomes() {
     if (!incomeTableBody) return;
-
-    // Get selected month and year
+    incomeTableBody.innerHTML = '';
     const selectedMonth = monthSelect ? parseInt(monthSelect.value) : new Date().getMonth();
     const selectedYear = yearSelect ? parseInt(yearSelect.value) : new Date().getFullYear();
-
-    // Clear existing content
-    incomeTableBody.innerHTML = '';
-
-    // Filter incomes for selected month and year
-    const filteredIncomes = sampleIncomes.filter(income => {
-        const incomeDate = new Date(income.date);
-        return incomeDate.getMonth() === selectedMonth && 
-               incomeDate.getFullYear() === selectedYear;
-    });
-
-    // Add filtered incomes to the table
-    filteredIncomes.forEach(income => {
-        const row = document.createElement('tr');
-        
-        // Format date
-        const date = new Date(income.date);
-        const formattedDate = date.toLocaleDateString('en-IN', {
-            day: '2-digit',
-            month: 'short',
-            year: 'numeric'
+    console.log('Selected month:', selectedMonth, 'Selected year:', selectedYear);
+    try {
+        const res = await fetch(`/api/transactions/${user_id}`);
+        const data = await res.json();
+        const incomes = data.filter(t => t.type === 'income');
+        const filtered = incomes.filter(inc => {
+            const d = new Date(inc.date);
+            console.log('Income date:', d, 'Month:', d.getMonth(), 'Year:', d.getFullYear());
+            return d.getMonth() === selectedMonth && d.getFullYear() === selectedYear;
         });
-
-        row.innerHTML = `
-            <td>${formattedDate}</td>
-            <td>${income.source}</td>
-            <td>${income.category}</td>
-            <td>₹${income.amount.toLocaleString('en-IN')}</td>
-            <td>
-                <button class="btn btn-sm btn-danger" onclick="deleteIncome(this)">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </td>
-        `;
-        
-        incomeTableBody.appendChild(row);
-    });
-
-    // Show message if no incomes found
-    if (filteredIncomes.length === 0) {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td colspan="5" class="text-center">No income found for selected period</td>
-        `;
-        incomeTableBody.appendChild(row);
+        if (filtered.length === 0) {
+            const row = document.createElement('tr');
+            row.innerHTML = `<td colspan="5" class="text-center">No income found for selected period</td>`;
+            incomeTableBody.appendChild(row);
+        } else {
+            filtered.forEach(income => {
+                const date = new Date(income.date);
+                const formattedDate = date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${formattedDate}</td>
+                    <td>${income.source}</td>
+                    <td>${income.category}</td>
+                    <td>₹${income.amount.toLocaleString('en-IN')}</td>
+                    <td></td>
+                `;
+                incomeTableBody.appendChild(row);
+            });
+        }
+    } catch (err) {
+        incomeTableBody.innerHTML = `<tr><td colspan="5" class="text-center">Error loading incomes</td></tr>`;
     }
 }
 
-// Handle income form submission
-function handleIncomeSubmit() {
-    const source = document.getElementById('income-source').value;
-    const amount = parseFloat(document.getElementById('income-amount').value);
-    const date = document.getElementById('income-date').value;
-    const category = document.getElementById('income-category').value;
-    
-    // Validate form
-    if (!source || !amount || !date || !category) {
-        alert('Please fill in all fields');
-        return;
-    }
-    
-    // Add new income to sample data
-    sampleIncomes.push({
-        date,
-        source,
-        category,
-        amount
+// Handle form submit
+if (incomeForm) {
+    incomeForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const source = document.getElementById('income-source').value;
+        const amount = parseFloat(document.getElementById('income-amount').value);
+        const date = document.getElementById('income-date').value;
+        const category = document.getElementById('income-category').value;
+        if (!source || !amount || !date || !category) {
+            alert('Please fill in all fields');
+            return;
+        }
+        const payload = {
+            user_id,
+            type: 'income',
+            date,
+            source,
+            category,
+            amount
+        };
+        await fetch('/api/transactions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        incomeForm.reset();
+        if (incomeModal) incomeModal.style.display = 'none';
+        fetchAndDisplayIncomes();
     });
-    
-    // Reset form
-    document.getElementById('income-form').reset();
-    
-    // Close modal
-    if (addIncomeModal) {
-        addIncomeModal.hide();
-    }
-    
-    // Refresh income list
-    displaySampleIncomes();
-    
-    // Show success message
-    alert('Income added successfully!');
 }
 
-// Delete income function
-function deleteIncome(button) {
-    const row = button.closest('tr');
-    const date = row.cells[0].textContent;
-    const source = row.cells[1].textContent;
-    const amount = parseFloat(row.cells[3].textContent.replace('₹', '').replace(/,/g, ''));
-    
-    // Remove from sample data
-    const index = sampleIncomes.findIndex(income => 
-        income.source === source && 
-        income.amount === amount
-    );
-    
-    if (index !== -1) {
-        sampleIncomes.splice(index, 1);
-    }
-    
-    // Remove from table
-    row.remove();
-} 
+// Month/year change
+if (monthSelect) monthSelect.addEventListener('change', fetchAndDisplayIncomes);
+if (yearSelect) yearSelect.addEventListener('change', fetchAndDisplayIncomes);
+
+document.addEventListener('DOMContentLoaded', () => {
+    initializeDateSelectors();
+    fetchAndDisplayIncomes();
+}); 
