@@ -7,8 +7,7 @@ import { signInWithEmailAndPassword, signInWithPopup, setPersistence, browserLoc
 const loginForm = document.getElementById('login-form');
 const emailInput = document.getElementById('email');
 const passwordInput = document.getElementById('password');
-const rememberMe = document.getElementById('remember-me');
-const togglePassword = document.querySelector('.toggle-password');
+const googleSignInButton = document.getElementById('google-signin');
 
 // Theme Toggle Functionality
 document.addEventListener('DOMContentLoaded', function() {
@@ -37,116 +36,78 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Function to show error message
-function showError(elementId, message) {
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'error-message';
-    errorDiv.textContent = message;
-    
-    const inputGroup = document.getElementById(elementId).closest('.input-group');
-    // Remove any existing error message
-    const existingError = inputGroup.querySelector('.error-message');
-    if (existingError) {
-        existingError.remove();
+// Function to show error message below input
+function showError(element, message) {
+    let errorDiv = element.nextElementSibling;
+    if (!errorDiv || !errorDiv.classList.contains('error-message')) {
+        errorDiv = document.createElement('div');
+        errorDiv.className = 'error-message';
+        element.parentNode.insertBefore(errorDiv, element.nextSibling);
     }
-    
-    inputGroup.classList.add('error');
-    inputGroup.appendChild(errorDiv);
+    errorDiv.textContent = message;
 }
 
-// Function to clear error message
-function clearError(elementId) {
-    const inputGroup = document.getElementById(elementId).closest('.input-group');
-    const errorDiv = inputGroup.querySelector('.error-message');
-    if (errorDiv) {
+function clearError(element) {
+    let errorDiv = element.nextElementSibling;
+    if (errorDiv && errorDiv.classList.contains('error-message')) {
         errorDiv.remove();
     }
-    inputGroup.classList.remove('error');
 }
 
 // Handle form submission
 loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    
     const email = emailInput.value;
     const password = passwordInput.value;
-    
+    clearError(emailInput);
+    clearError(passwordInput);
+    if (!email) {
+        showError(emailInput, 'Email is required');
+        return;
+    }
+    if (!password) {
+        showError(passwordInput, 'Password is required');
+        return;
+    }
     try {
-        // Show loading state
-        const submitButton = loginForm.querySelector('button[type="submit"]');
-        const originalText = submitButton.innerHTML;
-        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
-        submitButton.disabled = true;
-        
-        // Sign in with email and password
-        const userCredential = await auth.signInWithEmailAndPassword(email, password);
-        
-        // Set persistence based on remember me checkbox
-        const persistence = rememberMe.checked ? 
-            firebase.auth.Auth.Persistence.LOCAL : 
-            firebase.auth.Auth.Persistence.SESSION;
-        
-        await auth.setPersistence(persistence);
-        
-        // Redirect to dashboard
-        window.location.href = '../dashboard';
-        
+        await signInWithEmailAndPassword(auth, email, password);
+        window.location.href = '../home/home.html';
     } catch (error) {
-        // Reset button state
-        const submitButton = loginForm.querySelector('button[type="submit"]');
-        submitButton.innerHTML = originalText;
-        submitButton.disabled = false;
-        
-        // Handle errors
-        let errorMessage = 'An error occurred during sign in.';
-        
         switch (error.code) {
             case 'auth/invalid-email':
-                errorMessage = 'Invalid email address.';
+                showError(emailInput, 'Invalid email address.');
                 break;
             case 'auth/user-disabled':
-                errorMessage = 'This account has been disabled.';
+                showError(emailInput, 'This account has been disabled.');
                 break;
             case 'auth/user-not-found':
-                errorMessage = 'No account found with this email.';
+                showError(emailInput, 'No account found with this email.');
                 break;
             case 'auth/wrong-password':
-                errorMessage = 'Incorrect password.';
+                showError(passwordInput, 'Incorrect password.');
                 break;
             case 'auth/too-many-requests':
-                errorMessage = 'Too many failed attempts. Please try again later.';
+                showError(emailInput, 'Too many failed attempts. Please try again later.');
                 break;
+            default:
+                showError(emailInput, 'An error occurred. Please try again');
         }
-        
-        // Show error message
-        alert(errorMessage);
     }
 });
 
-// Handle Google Sign In
-document.getElementById('google-signin').addEventListener('click', async () => {
-    try {
-        // Clear any existing errors
-        clearError('email');
-        clearError('password');
-        
-        console.log('Attempting Google sign in...');
-        const result = await signInWithPopup(auth, googleProvider);
-        console.log('Google sign in successful:', result.user);
-        
-        // Redirect to home page
-        window.location.href = '../home/home.html';
-    } catch (error) {
-        console.error('Google sign in error:', error);
-        if (error.code === 'auth/popup-closed-by-user') {
-            showError('email', 'Sign in cancelled');
-        } else if (error.code === 'auth/popup-blocked') {
-            showError('email', 'Pop-up blocked by browser. Please allow pop-ups for this site');
-        } else {
-            showError('email', 'Could not sign in with Google. Please try again');
+// Google Sign In
+if (googleSignInButton) {
+    googleSignInButton.addEventListener('click', async () => {
+        clearError(emailInput);
+        clearError(passwordInput);
+        try {
+            await signInWithPopup(auth, googleProvider);
+            window.location.href = '../home/home.html';
+        } catch (error) {
+            showError(emailInput, 'Google sign in failed. Please try again.');
         }
-    }
-});
+    });
+}
 
 // Check for remembered email
 window.addEventListener('load', () => {
@@ -207,11 +168,3 @@ passwordInput.addEventListener('input', () => {
         passwordError.textContent = '';
     }
 });
-
-// Check if user is already logged in
-auth.onAuthStateChanged((user) => {
-    if (user) {
-        // User is signed in, redirect to dashboard
-        window.location.href = '../dashboard';
-    }
-}); 

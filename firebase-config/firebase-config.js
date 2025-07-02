@@ -8,8 +8,9 @@ const firebaseConfig = {
     projectId: "smartfin-40e30",
     storageBucket: "smartfin-40e30.appspot.com",
     messagingSenderId: "14976464670",
-    appId: "1:14976464670:web:98756ac774dc67b3613b0f"
-};
+    appId: "1:14976464670:web:98756ac774dc67b3613b0f",
+    measurementId: "G-S5XWF0BNPJ"
+  };
 
 // Validate Firebase config
 function validateFirebaseConfig(config) {

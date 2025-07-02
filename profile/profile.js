@@ -1,18 +1,4 @@
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js';
-import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js';
-
-// Firebase config (should match your project)
-const firebaseConfig = {
-    apiKey: "AIzaSyDqXpYwQZQZQZQZQZQZQZQZQZQZQZQZQZQ",
-    authDomain: "smartfin-12345.firebaseapp.com",
-    projectId: "smartfin-12345",
-    storageBucket: "smartfin-12345.appspot.com",
-    messagingSenderId: "123456789012",
-    appId: "1:123456789012:web:1234567890123456789012"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+import { auth } from '../firebase-config/firebase-config.js';
 
 const profileImage = document.getElementById('profile-image');
 const profileInitial = document.getElementById('profile-initial');

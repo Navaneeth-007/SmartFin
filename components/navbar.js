@@ -2,6 +2,7 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js';
 import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js';
 import { initializeThemeManager, setupThemeToggle } from '../shared/theme-manager.js';
+import { auth } from '../firebase-config/firebase-config.js';
 
 // Initialize Firebase
 const firebaseConfig = {
