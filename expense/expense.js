@@ -8,70 +8,10 @@ const monthSelect = document.getElementById('month-select');
 const yearSelect = document.getElementById('year-select');
 const categoryBreakdownModal = document.getElementById('category-breakdown-modal');
 const viewCategoryDetailsBtn = document.getElementById('view-category-details');
+const expenseForm = document.getElementById('manual-expense-form');
 
-// Sample expense data
-const sampleExpenses = [
-    {
-        date: '2025-05-15',
-        description: 'Grocery shopping at Big Bazaar',
-        category: 'Food & Dining',
-        amount: 2500
-    },
-    {
-        date: '2025-05-14',
-        description: 'Monthly electricity bill',
-        category: 'Bills & Utilities',
-        amount: 1800
-    },
-    {
-        date: '2025-05-13',
-        description: 'Movie tickets - Avengers',
-        category: 'Entertainment',
-        amount: 800
-    },
-    {
-        date: '2025-05-12',
-        description: 'Fuel for car',
-        category: 'Transportation',
-        amount: 2000
-    },
-    {
-        date: '2025-05-11',
-        description: 'New headphones',
-        category: 'Shopping',
-        amount: 3500
-    },
-    {
-        date: '2025-04-20',
-        description: 'Dinner at restaurant',
-        category: 'Food & Dining',
-        amount: 1200
-    },
-    {
-        date: '2025-04-15',
-        description: 'Internet bill',
-        category: 'Bills & Utilities',
-        amount: 900
-    },
-    {
-        date: '2025-04-10',
-        description: 'Movie tickets - Dune',
-        category: 'Entertainment',
-        amount: 600
-    },
-    {
-        date: '2025-04-05',
-        description: 'Fuel for bike',
-        category: 'Transportation',
-        amount: 500
-    },
-    {
-        date: '2025-04-01',
-        description: 'New shoes',
-        category: 'Shopping',
-        amount: 2000
-    }
-];
+// Replace all sample/demo logic with backend integration
+const user_id = 'PLACEHOLDER_USER_ID'; // TODO: Replace with real user id
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
@@ -117,8 +57,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize date selectors
     initializeDateSelectors();
 
-    // Display sample expenses
-    displaySampleExpenses();
+    // Fetch and display expenses
+    fetchAndDisplayExpenses();
 
     // Category Breakdown Modal logic
     if (viewCategoryDetailsBtn && categoryBreakdownModal) {
@@ -141,7 +81,7 @@ function initializeDateSelectors() {
     // Set current month
     if (monthSelect) {
         monthSelect.value = currentDate.getMonth();
-        monthSelect.addEventListener('change', displaySampleExpenses);
+        monthSelect.addEventListener('change', fetchAndDisplayExpenses);
     }
     
     // Clear existing options
@@ -158,64 +98,82 @@ function initializeDateSelectors() {
         
         // Set current year
         yearSelect.value = currentYear;
-        yearSelect.addEventListener('change', displaySampleExpenses);
+        yearSelect.addEventListener('change', fetchAndDisplayExpenses);
     }
 }
 
-// Display sample expenses in the table
-function displaySampleExpenses() {
+// Fetch and display expenses
+async function fetchAndDisplayExpenses() {
     if (!expenseTableBody) return;
-
-    // Get selected month and year
+    expenseTableBody.innerHTML = '';
     const selectedMonth = monthSelect ? parseInt(monthSelect.value) : new Date().getMonth();
     const selectedYear = yearSelect ? parseInt(yearSelect.value) : new Date().getFullYear();
-
-    // Clear existing content
-    expenseTableBody.innerHTML = '';
-
-    // Filter expenses for selected month and year
-    const filteredExpenses = sampleExpenses.filter(expense => {
-        const expenseDate = new Date(expense.date);
-        return expenseDate.getMonth() === selectedMonth && 
-               expenseDate.getFullYear() === selectedYear;
-    });
-
-    // Add filtered expenses to the table
-    filteredExpenses.forEach(expense => {
-        const row = document.createElement('tr');
-        
-        // Format date
-        const date = new Date(expense.date);
-        const formattedDate = date.toLocaleDateString('en-IN', {
-            day: '2-digit',
-            month: 'short',
-            year: 'numeric'
+    try {
+        const res = await fetch(`/api/transactions/${user_id}`);
+        const data = await res.json();
+        const expenses = data.filter(t => t.type === 'expense');
+        const filtered = expenses.filter(exp => {
+            const d = new Date(exp.date);
+            return d.getMonth() === selectedMonth && d.getFullYear() === selectedYear;
         });
-
-        row.innerHTML = `
-            <td>${formattedDate}</td>
-            <td>${expense.description}</td>
-            <td>${expense.category}</td>
-            <td>₹${expense.amount.toLocaleString('en-IN')}</td>
-            <td>
-                <button class="btn btn-sm btn-danger" onclick="deleteExpense(this)">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </td>
-        `;
-        
-        expenseTableBody.appendChild(row);
-    });
-
-    // Show message if no expenses found
-    if (filteredExpenses.length === 0) {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td colspan="5" class="text-center">No expenses found for selected period</td>
-        `;
-        expenseTableBody.appendChild(row);
+        if (filtered.length === 0) {
+            const row = document.createElement('tr');
+            row.innerHTML = `<td colspan="5" class="text-center">No expenses found for selected period</td>`;
+            expenseTableBody.appendChild(row);
+        } else {
+            filtered.forEach(expense => {
+                const date = new Date(expense.date);
+                const formattedDate = date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${formattedDate}</td>
+                    <td>${expense.description}</td>
+                    <td>${expense.category}</td>
+                    <td>₹${expense.amount.toLocaleString('en-IN')}</td>
+                    <td></td>
+                `;
+                expenseTableBody.appendChild(row);
+            });
+        }
+    } catch (err) {
+        expenseTableBody.innerHTML = `<tr><td colspan="5" class="text-center">Error loading expenses</td></tr>`;
     }
 }
+
+// Handle form submit
+if (expenseForm) {
+    expenseForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const description = document.getElementById('expense-description').value;
+        const amount = parseFloat(document.getElementById('expense-amount').value);
+        const date = document.getElementById('expense-date').value;
+        const category = document.getElementById('expense-category').value;
+        if (!description || !amount || !date || !category) {
+            alert('Please fill in all fields');
+            return;
+        }
+        const payload = {
+            user_id,
+            type: 'expense',
+            date,
+            description,
+            category,
+            amount
+        };
+        await fetch('/api/transactions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        expenseForm.reset();
+        if (manualExpenseModal) manualExpenseModal.style.display = 'none';
+        fetchAndDisplayExpenses();
+    });
+}
+
+// Month/year change
+if (monthSelect) monthSelect.addEventListener('change', fetchAndDisplayExpenses);
+if (yearSelect) yearSelect.addEventListener('change', fetchAndDisplayExpenses);
 
 // Modal Functions
 function openModal(modal) {

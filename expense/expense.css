@@ -1,19 +1,18 @@
 /* Root Variables */
 :root {
-    --primary-color: #6366f1;
-    --secondary-color: #4f46e5;
-    --accent-color: #818cf8;
-    --background-primary: #ffffff;
-    --background-secondary: #f3f4f6;
-    --text-primary: #1f2937;
-    --text-secondary: #4b5563;
+    --primary-color: #6366F1;
+    --primary-gradient: linear-gradient(90deg, #6366F1 0%, #A855F7 100%);
+    --accent-color: #06B6D4;
+    --accent-gradient: linear-gradient(90deg, #F59E42 0%, #F43F5E 100%);
+    --background-primary: #f8fafc;
+    --background-secondary: #e0e7ef;
+    --glass-background: rgba(255,255,255,0.85);
+    --glass-border: rgba(99,102,241,0.15);
+    --text-primary: #18181b;
+    --text-secondary: #6366f1;
     --border-color: #e5e7eb;
-    --success-color: #10b981;
-    --danger-color: #ef4444;
-    --warning-color: #f59e0b;
-    --glass-background: rgba(255, 255, 255, 0.8);
-    --glass-border: rgba(255, 255, 255, 0.2);
-    --shadow-color: rgba(0, 0, 0, 0.1);
+    --shadow-color: rgba(99,102,241,0.08);
+    --hover-color: rgba(99,102,241,0.08);
     --transition-speed: 0.3s;
 }
 
@@ -324,7 +323,6 @@ body {
 .expense-list {
     padding: 2rem 1.5rem;
     animation: fadeInUp 1.1s;
-    margin-top: 0;
 }
 
 .expense-list-header {
@@ -520,11 +518,11 @@ tr:hover {
 
 /* AI Suggestions Styles */
 .ai-suggestions-container {
-    background: var(--card-bg);
+    background: var(--glass-background);
     border-radius: 1rem;
     padding: 1.5rem;
-    box-shadow: var(--card-shadow);
-    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 6px -1px var(--shadow-color);
+    border: 1px solid var(--glass-border);
     backdrop-filter: blur(10px);
     transition: all 0.3s ease;
     margin-bottom: 1rem;
@@ -541,6 +539,13 @@ tr:hover {
 
 .ai-suggestions-header i {
     font-size: 1.5rem;
+    color: var(--success-color);
+}
+
+.ai-suggestions-header h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-primary);
 }
 
 .ai-suggestions-content {
@@ -553,7 +558,7 @@ tr:hover {
     display: flex;
     gap: 1rem;
     padding: 1rem;
-    background: var(--bg-secondary);
+    background: var(--background-secondary);
     border-radius: 0.75rem;
     transition: all 0.3s ease;
     animation: slideIn 0.5s ease forwards;
@@ -566,7 +571,7 @@ tr:hover {
 
 .suggestion-item:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px -1px var(--shadow-color);
 }
 
 .suggestion-icon {
@@ -586,6 +591,8 @@ tr:hover {
 .suggestion-text h4 {
     margin-bottom: 0.5rem;
     color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: 600;
 }
 
 .suggestion-text p {
@@ -607,7 +614,7 @@ tr:hover {
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 1rem;
-    background: var(--bg-secondary);
+    background: var(--background-secondary);
     border: 1px solid var(--border-color);
     border-radius: 0.5rem;
     color: var(--text-primary);
