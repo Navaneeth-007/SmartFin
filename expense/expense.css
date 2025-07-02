@@ -294,31 +294,6 @@ body {
     box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.2);
 }
 
-/* Upload Area Styles */
-.upload-area {
-    border: 2px dashed var(--border-color);
-    border-radius: 8px;
-    padding: 2rem;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.upload-area i {
-    font-size: 2rem;
-    color: var(--primary-color);
-    margin-bottom: 1rem;
-}
-
-.upload-area p {
-    margin: 0;
-    color: var(--text-color);
-}
-
-.upload-area input[type="file"] {
-    display: none;
-}
-
 /* Expense List */
 .expense-list {
     padding: 2rem 1.5rem;

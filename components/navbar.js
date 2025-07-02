@@ -70,7 +70,6 @@ const sampleNotifications = [
     }
 ];
 
-// Update active nav link
 function updateActiveNavLink() {
     const currentPath = window.location.pathname;
     const navLinks = document.querySelectorAll('.nav-link');
@@ -133,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeThemeManager();
     setupThemeToggle();
     updateActiveNavLink();
-
+  
     if (logoutButton) {
         logoutButton.addEventListener('click', async () => {
             try {
@@ -154,8 +153,6 @@ document.addEventListener('DOMContentLoaded', () => {
             notificationDropdown.classList.toggle('show');
         });
     }
-
-    // Close dropdowns on outside click
     document.addEventListener('click', (e) => {
         if (!e.target.closest('.notification-container')) {
             if (notificationDropdown) {
@@ -164,9 +161,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+
     // Notification interaction
     renderNotifications();
-
+  
     document.addEventListener('click', (e) => {
         const notificationItem = e.target.closest('.notification-item');
         if (notificationItem) {
@@ -178,6 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
+
 
     const markAllReadBtn = document.querySelector('.mark-all-read');
     if (markAllReadBtn) {

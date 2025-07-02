@@ -5,7 +5,7 @@ from bson import ObjectId
 from datetime import datetime
 
 # --- CONFIG ---
-MONGO_URI = 'mongodb://localhost:27017/'  # Change if using MongoDB Atlas
+MONGO_URI = 'mongodb+srv://navaneeth007:navaneeth007@cluster0.yfkkdys.mongodb.net/'  # Change if using MongoDB Atlas
 DB_NAME = 'smartfin'
 
 # --- APP SETUP ---
