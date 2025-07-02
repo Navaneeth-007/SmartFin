@@ -14,9 +14,12 @@ const expenseForm = document.getElementById('manual-expense-form');
 const incomeTableBody = document.getElementById('income-table-body');
 const incomeMonthSelect = document.getElementById('income-month-select');
 const incomeYearSelect = document.getElementById('income-year-select');
+const incomeForm = document.getElementById('income-form');
+const addIncomeBtn = document.querySelector('.action-buttons .btn-primary');
+const incomeModal = document.getElementById('add-income-modal');
 
 // Replace all sample/demo logic with backend integration
-const user_id = 'PLACEHOLDER_USER_ID'; // TODO: Replace with real user id
+const user_id = 'PLACEHOLDER_USER_ID'; // Replace with real user id
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
@@ -79,7 +82,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize date selectors for income
     initializeIncomeDateSelectors();
-    fetchAndDisplayIncome();
+    fetchAndDisplayIncomes();
+
+    // Open modal
+    if (addIncomeBtn && incomeModal) {
+        addIncomeBtn.addEventListener('click', () => incomeModal.style.display = 'block');
+    }
+    // Close modal
+    if (closeModalButtons && incomeModal) {
+        closeModalButtons.forEach(btn => btn.addEventListener('click', () => incomeModal.style.display = 'none'));
+    }
+    window.addEventListener('click', (event) => {
+        if (event.target === incomeModal) incomeModal.style.display = 'none';
+    });
 });
 
 // Initialize date selectors
@@ -238,30 +253,26 @@ function initializeIncomeDateSelectors() {
     window.incomeYearSelect = document.getElementById('income-year-select');
 
     // Attach listeners only once
-    window.incomeMonthSelect.addEventListener('change', fetchAndDisplayIncome);
-    window.incomeYearSelect.addEventListener('change', fetchAndDisplayIncome);
+    window.incomeMonthSelect.addEventListener('change', fetchAndDisplayIncomes);
+    window.incomeYearSelect.addEventListener('change', fetchAndDisplayIncomes);
 }
 
-// Fetch and display income
-async function fetchAndDisplayIncome() {
+// Fetch and display incomes
+async function fetchAndDisplayIncomes() {
     if (!incomeTableBody) return;
     incomeTableBody.innerHTML = '';
     const selectedMonth = incomeMonthSelect ? parseInt(incomeMonthSelect.value) : new Date().getMonth();
     const selectedYear = incomeYearSelect ? parseInt(incomeYearSelect.value) : new Date().getFullYear();
     try {
-        const res = await fetch(`/api/transactions/${user_id}`);
+        const res = await fetch(`/api/income?uid=${user_id}&month=${selectedMonth}&year=${selectedYear}`);
         const data = await res.json();
-        const incomes = data.filter(t => t.type === 'income');
-        const filtered = incomes.filter(inc => {
-            const d = new Date(inc.date);
-            return d.getMonth() === selectedMonth && d.getFullYear() === selectedYear;
-        });
-        if (filtered.length === 0) {
+        const incomes = data.incomes || [];
+        if (incomes.length === 0) {
             const row = document.createElement('tr');
             row.innerHTML = `<td colspan="4" class="text-center">No income found for selected period</td>`;
             incomeTableBody.appendChild(row);
         } else {
-            filtered.forEach(income => {
+            incomes.forEach(income => {
                 const date = new Date(income.date);
                 const formattedDate = date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
                 const row = document.createElement('tr');
@@ -279,9 +290,41 @@ async function fetchAndDisplayIncome() {
     }
 }
 
-// Delete income function
+// Handle form submit
+if (incomeForm) {
+    incomeForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const source = document.getElementById('income-source').value;
+        const amount = parseFloat(document.getElementById('income-amount').value);
+        const date = document.getElementById('income-date').value;
+        if (!source || !amount || !date) {
+            alert('Please fill in all fields');
+            return;
+        }
+        const payload = {
+            uid: user_id,
+            income: { date, source, amount }
+        };
+        await fetch('/api/income', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        incomeForm.reset();
+        if (incomeModal) incomeModal.style.display = 'none';
+        fetchAndDisplayIncomes();
+    });
+}
+
+// Month/year change
+if (incomeMonthSelect) incomeMonthSelect.addEventListener('change', fetchAndDisplayIncomes);
+if (incomeYearSelect) incomeYearSelect.addEventListener('change', fetchAndDisplayIncomes);
+
+// Initial fetch
+fetchAndDisplayIncomes();
+
+// Delete income function (optional, just removes row)
 function deleteIncome(button) {
     const row = button.closest('tr');
     row.remove();
-    // TODO: Optionally, send a DELETE request to backend here
 } 
