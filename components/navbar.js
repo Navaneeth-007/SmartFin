@@ -212,23 +212,19 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Profile dropdown toggle
     if (profileButton && profileDropdown) {
-        // Remove previous event listeners if any
-        profileButton.replaceWith(profileButton.cloneNode(true));
-        const newProfileButton = document.querySelector('.profile-button');
-        newProfileButton.addEventListener('click', () => {
+        profileButton.addEventListener('click', () => {
             profileDropdown.classList.toggle('show');
         });
-
         // --- IMPROVEMENT 2: Close dropdown on any dropdown-item click (with delay) ---
         const dropdownItems = profileDropdown.querySelectorAll('.dropdown-item[href]');
         dropdownItems.forEach(item => {
             item.addEventListener('click', (e) => {
                 profileDropdown.classList.remove('show');
-                // Add a small delay before navigation for visual feedback
+                profileDropdown.style.display = 'none'; // Hide immediately
                 const href = item.getAttribute('href');
                 if (href && href !== '#') {
                     e.preventDefault();
-                    setTimeout(() => { window.location.href = href; }, 120);
+                    window.location.href = href;
                 }
             });
         });

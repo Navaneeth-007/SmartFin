@@ -17,24 +17,6 @@
     --transition-speed: 0.3s;
 }
 
-/* Dark Theme Variables */
-[data-theme="dark"] {
-    --primary-color: #3498db;
-    --secondary-color: #2c3e50;
-    --accent-color: #e74c3c;
-    --background-primary: #111827;
-    --background-secondary: #1f2937;
-    --text-primary: #f3f4f6;
-    --text-secondary: #d1d5db;
-    --border-color: #374151;
-    --success-color: #2ecc71;
-    --danger-color: #e74c3c;
-    --warning-color: #f59e0b;
-    --glass-background: rgba(17, 24, 39, 0.8);
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --shadow-color: rgba(0, 0, 0, 0.3);
-}
-
 /* Base Styles */
 body {
     font-family: 'Inter', sans-serif;
@@ -334,16 +316,6 @@ tr:hover {
     filter: grayscale(1);
 }
 
-/* Dark theme adjustments */
-[data-theme="dark"] .modal-content {
-    background: var(--glass-background);
-}
-
-[data-theme="dark"] .modal-header,
-[data-theme="dark"] .modal-footer {
-    border-color: var(--border-color);
-}
-
 /* Date Selectors Styling */
 .date-selectors {
     display: flex;
@@ -372,16 +344,6 @@ tr:hover {
 .date-selectors .form-select option {
     background-color: var(--glass-background);
     color: var(--text-primary);
-}
-
-/* Dark theme adjustments */
-[data-theme="dark"] .date-selectors .form-select {
-    background-color: var(--glass-background);
-    border-color: var(--border-color);
-}
-
-[data-theme="dark"] .date-selectors .form-select:hover {
-    border-color: var(--primary-color);
 }
 
 /* Animations */

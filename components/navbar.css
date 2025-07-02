@@ -16,23 +16,6 @@
     --transition-speed: 0.3s;
 }
 
-/* Dark Theme Variables */
-[data-theme="dark"] {
-    --primary-color: #A855F7;
-    --primary-gradient: linear-gradient(90deg, #A855F7 0%, #6366F1 100%);
-    --accent-color: #06B6D4;
-    --accent-gradient: linear-gradient(90deg, #F43F5E 0%, #F59E42 100%);
-    --background-primary: #18181b;
-    --background-secondary: #232336;
-    --glass-background: rgba(24,24,27,0.85);
-    --glass-border: rgba(168,85,247,0.15);
-    --text-primary: #f3f4f6;
-    --text-secondary: #a855f7;
-    --border-color: #232336;
-    --shadow-color: rgba(168,85,247,0.12);
-    --hover-color: rgba(168,85,247,0.08);
-}
-
 /* Navbar Base Styles */
 .navbar {
     background: var(--primary-gradient);
@@ -121,31 +104,6 @@
     align-items: center;
     gap: 0.75rem;
     height: 100%;
-}
-
-/* Theme Toggle */
-.theme-toggle {
-    background: var(--glass-background);
-    border: 2px solid var(--accent-color);
-    color: var(--accent-color);
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.3rem;
-    margin-left: 1rem;
-    cursor: pointer;
-    transition: background var(--transition-speed), border var(--transition-speed), color var(--transition-speed), transform 0.2s;
-    box-shadow: 0 2px 8px var(--shadow-color);
-}
-
-.theme-toggle:hover {
-    background: var(--accent-gradient);
-    color: #fff;
-    border-color: #fff;
-    transform: rotate(20deg) scale(1.08);
 }
 
 /* Notification Styles */
@@ -321,20 +279,6 @@
     margin-bottom: 0.5rem;
     color: var(--text-secondary);
     opacity: 0.5;
-}
-
-/* Dark theme adjustments */
-[data-theme="dark"] .notification-dropdown {
-    background: var(--glass-background);
-    border-color: var(--glass-border);
-}
-
-[data-theme="dark"] .notification-item {
-    background: var(--background-secondary);
-}
-
-[data-theme="dark"] .notification-item:hover {
-    background: var(--hover-color);
 }
 
 /* Profile Section */
@@ -553,4 +497,10 @@
     .profile-dropdown:hover .dropdown-menu {
         transform: translateY(0);
     }
+}
+
+.dropdown-menu.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
 } 

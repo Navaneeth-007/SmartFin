@@ -1,8 +1,6 @@
 // DOM Elements
 const manualExpenseModal = document.getElementById('manual-expense-modal');
-const billUploadModal = document.getElementById('bill-upload-modal');
 const addManualBtn = document.getElementById('add-manual-btn');
-const uploadBillBtn = document.getElementById('upload-bill-btn');
 const closeModalButtons = document.querySelectorAll('.close-modal');
 const uploadArea = document.getElementById('upload-area');
 const expenseTableBody = document.getElementById('expense-table-body');
@@ -82,16 +80,11 @@ document.addEventListener('DOMContentLoaded', () => {
         addManualBtn.addEventListener('click', () => openModal(manualExpenseModal));
     }
     
-    if (uploadBillBtn) {
-        uploadBillBtn.addEventListener('click', () => openModal(billUploadModal));
-    }
-    
     // Add event listeners for close buttons
     if (closeModalButtons) {
         closeModalButtons.forEach(button => {
             button.addEventListener('click', () => {
                 closeModal(manualExpenseModal);
-                closeModal(billUploadModal);
             });
         });
     }
@@ -113,16 +106,11 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             uploadArea.style.borderColor = 'var(--border-color)';
             uploadArea.style.background = 'transparent';
-            
-            const file = e.dataTransfer.files[0];
-            if (file && file.type.startsWith('image/')) {
-                document.getElementById('bill-image').files = e.dataTransfer.files;
-            }
         });
 
         // Handle click on upload area
         uploadArea.addEventListener('click', () => {
-            document.getElementById('bill-image').click();
+            // This part is removed as per the instructions
         });
     }
 
@@ -242,9 +230,6 @@ function closeModal(modal) {
 window.addEventListener('click', (event) => {
     if (event.target === manualExpenseModal) {
         closeModal(manualExpenseModal);
-    }
-    if (event.target === billUploadModal) {
-        closeModal(billUploadModal);
     }
     if (event.target === categoryBreakdownModal) {
         closeModal(categoryBreakdownModal);

@@ -11,74 +11,6 @@
     <!-- Firebase SDK -->
     <script type="module" src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script type="module" src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <style>
-        :root {
-            --primary-color: #4a90e2;
-            --text-color: #333;
-            --bg-color: #ffffff;
-            --input-bg: #f5f5f5;
-            --border-color: #ddd;
-            --shadow-color: rgba(0, 0, 0, 0.1);
-            --error-color: #e74c3c;
-            --success-color: #2ecc71;
-            --transition-speed: 0.3s;
-        }
-
-        [data-theme="dark"] {
-            --primary-color: #5c9ce6;
-            --text-color: #f5f5f5;
-            --bg-color: #1a1a1a;
-            --input-bg: #2d2d2d;
-            --border-color: #404040;
-            --shadow-color: rgba(0, 0, 0, 0.3);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            transition: background-color var(--transition-speed), 
-                        color var(--transition-speed),
-                        border-color var(--transition-speed),
-                        box-shadow var(--transition-speed);
-        }
-
-        .theme-toggle {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: var(--input-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 1000;
-            transition: transform var(--transition-speed);
-        }
-
-        .theme-toggle:hover {
-            transform: scale(1.1);
-        }
-
-        .theme-toggle i {
-            position: absolute;
-            font-size: 1.2rem;
-            color: var(--text-color);
-            transition: opacity var(--transition-speed);
-        }
-
-        [data-theme="light"] .dark-icon {
-            opacity: 0;
-        }
-
-        [data-theme="dark"] .light-icon {
-            opacity: 0;
-        }
-    </style>
 </head>
 <body>
     <div class="signup-grid">
@@ -102,10 +34,6 @@
         </div>
         <!-- Right: Signup Form -->
         <div class="signup-right fade-in">
-            <div class="theme-toggle" id="themeToggle" title="Toggle theme">
-                <i class="fas fa-sun light-icon"></i>
-                <i class="fas fa-moon dark-icon"></i>
-            </div>
             <div class="signup-card glass-effect">
                 <h2 class="signup-title">Create your SmartFin account</h2>
                 <form id="signup-form">
