@@ -1,7 +1,7 @@
 // Import theme configuration
 import { initializeTheme, setupThemeToggle } from '../shared/theme-config.js';
 import { auth, googleProvider } from '../firebase-config/firebase-config.js';
-import { signInWithEmailAndPassword, signInWithPopup, setPersistence, browserLocalPersistence, browserSessionPersistence } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
+import { signInWithEmailAndPassword, signInWithPopup,sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
 
 // DOM Elements
 const loginForm = document.getElementById('login-form');
@@ -13,19 +13,6 @@ const googleSignInButton = document.getElementById('google-signin');
 document.addEventListener('DOMContentLoaded', function() {
     initializeTheme();
     setupThemeToggle();
-
-    // Password Toggle Functionality
-    if (togglePassword && passwordInput) {
-        togglePassword.addEventListener('click', function() {
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-            
-            // Toggle the eye icon
-            const icon = this.querySelector('i');
-            icon.classList.toggle('fa-eye');
-            icon.classList.toggle('fa-eye-slash');
-        });
-    }
 
     // Admin login button handler
     const adminLoginBtn = document.getElementById('admin-login');
