@@ -34,14 +34,6 @@
                     <i class="fas fa-robot"></i>
                     <span>AI Status</span>
                 </a>
-                <a href="../dashboard.html" class="nav-item" data-section="analytics">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Analytics</span>
-                </a>
-                <a href="../dashboard.html" class="nav-item" data-section="settings">
-                    <i class="fas fa-cog"></i>
-                    <span>Settings</span>
-                </a>
             </nav>
             <div class="sidebar-footer">
                 <button id="logoutBtn" class="btn btn-secondary w-100">
@@ -57,12 +49,6 @@
                 <div class="header-left">
                     <h1>AI System Status</h1>
                     <p class="welcome-message">Real-time monitoring and diagnostics</p>
-                </div>
-                <div class="header-right">
-                    <div class="theme-toggle" id="theme-toggle" title="Toggle theme">
-                        <i class="fas fa-sun light-icon"></i>
-                        <i class="fas fa-moon dark-icon"></i>
-                    </div>
                 </div>
             </header>
 
@@ -252,5 +238,75 @@
     </footer>
 
     <script type="module" src="script.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Sample data for Response Time Trend
+        const responseTimeCtx = document.getElementById('responseTimeChart').getContext('2d');
+        new Chart(responseTimeCtx, {
+            type: 'line',
+            data: {
+                labels: ['10:00', '10:10', '10:20', '10:30', '10:40', '10:50', '11:00'],
+                datasets: [{
+                    label: 'Response Time (s)',
+                    data: [0.6, 0.5, 0.55, 0.52, 0.48, 0.51, 0.5],
+                    borderColor: '#6366F1',
+                    backgroundColor: 'rgba(99,102,241,0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#6366F1',
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    title: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: true, title: { display: true, text: 'Seconds' } },
+                    x: { title: { display: true, text: 'Time' } }
+                }
+            }
+        });
+
+        // Sample data for Memory Usage Trend
+        const memoryUsageCtx = document.getElementById('memoryUsageChart').getContext('2d');
+        new Chart(memoryUsageCtx, {
+            type: 'line',
+            data: {
+                labels: ['10:00', '10:10', '10:20', '10:30', '10:40', '10:50', '11:00'],
+                datasets: [{
+                    label: 'Memory Usage (%)',
+                    data: [40, 42, 44, 45, 43, 46, 45],
+                    borderColor: '#06B6D4',
+                    backgroundColor: 'rgba(6,182,212,0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#06B6D4',
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    title: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: true, title: { display: true, text: 'Percent' } },
+                    x: { title: { display: true, text: 'Time' } }
+                }
+            }
+        });
+
+        var logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', function() {
+                window.location.href = '/admin/login/login.html';
+            });
+        }
+    });
+    </script>
 </body>
 </html> 

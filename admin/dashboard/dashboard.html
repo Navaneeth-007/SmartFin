@@ -34,14 +34,6 @@
                     <i class="fas fa-robot"></i>
                     <span>AI Status</span>
                 </a>
-                <a href="#" class="nav-item" data-section="analytics">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Analytics</span>
-                </a>
-                <a href="#" class="nav-item" data-section="settings">
-                    <i class="fas fa-cog"></i>
-                    <span>Settings</span>
-                </a>
             </nav>
             <div class="sidebar-footer">
                 <button id="logoutBtn" class="btn btn-secondary w-100">
@@ -56,13 +48,7 @@
             <header class="content-header glass-effect">
                 <div class="header-left">
                     <h1>Admin Dashboard</h1>
-                    <p class="welcome-message">Welcome back, Admin!</p>
-                </div>
-                <div class="header-right">
-                    <div class="theme-toggle" id="theme-toggle" title="Toggle theme">
-                        <i class="fas fa-sun light-icon"></i>
-                        <i class="fas fa-moon dark-icon"></i>
-                    </div>
+                    <p class="welcome-message">Welcome to the SmartFin admin panel</p>
                 </div>
             </header>
 
@@ -118,86 +104,6 @@
                             <div class="metric-info">
                                 <h3>API Status</h3>
                                 <p>Healthy</p>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Analytics Section -->
-                <section id="analytics" class="dashboard-section">
-                    <div class="section-header">
-                        <h2>Platform Analytics</h2>
-                    </div>
-                    <div class="analytics-grid">
-                        <div class="analytics-card glass-effect">
-                            <h3>Total Users</h3>
-                            <p class="analytics-value">1,234</p>
-                            <div class="analytics-trend positive">
-                                <i class="fas fa-arrow-up"></i>
-                                <span>12%</span>
-                            </div>
-                        </div>
-                        <div class="analytics-card glass-effect">
-                            <h3>Active Sessions</h3>
-                            <p class="analytics-value">456</p>
-                            <div class="analytics-trend positive">
-                                <i class="fas fa-arrow-up"></i>
-                                <span>8%</span>
-                            </div>
-                        </div>
-                        <div class="analytics-card glass-effect">
-                            <h3>AI Interactions</h3>
-                            <p class="analytics-value">789</p>
-                            <div class="analytics-trend positive">
-                                <i class="fas fa-arrow-up"></i>
-                                <span>15%</span>
-                            </div>
-                        </div>
-                        <div class="analytics-card glass-effect">
-                            <h3>Success Rate</h3>
-                            <p class="analytics-value">98%</p>
-                            <div class="analytics-trend positive">
-                                <i class="fas fa-arrow-up"></i>
-                                <span>2%</span>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Settings Section -->
-                <section id="settings" class="dashboard-section">
-                    <div class="section-header">
-                        <h2>Platform Settings</h2>
-                    </div>
-                    <div class="settings-grid">
-                        <div class="settings-card glass-effect">
-                            <h3>System Preferences</h3>
-                            <div class="settings-group">
-                                <label class="toggle-switch">
-                                    <input type="checkbox" id="maintenanceMode">
-                                    <span class="toggle-slider"></span>
-                                    <span class="toggle-label">Maintenance Mode</span>
-                                </label>
-                                <label class="toggle-switch">
-                                    <input type="checkbox" id="debugMode">
-                                    <span class="toggle-slider"></span>
-                                    <span class="toggle-label">Debug Mode</span>
-                                </label>
-                            </div>
-                        </div>
-                        <div class="settings-card glass-effect">
-                            <h3>Security Settings</h3>
-                            <div class="settings-group">
-                                <label class="toggle-switch">
-                                    <input type="checkbox" id="twoFactorAuth">
-                                    <span class="toggle-slider"></span>
-                                    <span class="toggle-label">Two-Factor Authentication</span>
-                                </label>
-                                <label class="toggle-switch">
-                                    <input type="checkbox" id="sessionTimeout">
-                                    <span class="toggle-slider"></span>
-                                    <span class="toggle-label">Session Timeout</span>
-                                </label>
                             </div>
                         </div>
                     </div>
@@ -269,5 +175,15 @@
     </footer>
 
     <script type="module" src="dashboard.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', function() {
+                window.location.href = '/admin/login/login.html';
+            });
+        }
+    });
+    </script>
 </body>
 </html> 
