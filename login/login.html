@@ -9,9 +9,9 @@
     <link rel="stylesheet" href="login.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <!-- Firebase SDK -->
-    <script src="/firebase-config/firebase-config.js"></script>
     <script type="module" src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script type="module" src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script type="module" src="login.js"></script>
 </head>
 <body>
     <div class="login-grid">
@@ -46,11 +46,10 @@
                         <label for="password">Password</label>
                         <input type="password" id="password" class="form-control" required autocomplete="current-password">
                     </div>
-                    <div class="form-options" style="display:flex;justify-content:space-between;align-items:center;">
-                        <label class="remember-me" style="margin-bottom:0;">
+                    <div class="form-options">
+                        <label class="remember-me">
                             <input type="checkbox" id="remember-me"> Remember me
                         </label>
-                        <a href="#" id="forgot-password-link" style="color:var(--primary-color);font-weight:500;text-decoration:none;">Forgot Password?</a>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Sign In</button>
                 </form>
@@ -66,87 +65,5 @@
             </div>
         </div>
     </div>
-    <!-- Forgot Password Modal -->
-    <div id="forgot-password-modal" class="modal" style="display:none;">
-      <div class="modal-content">
-        <span class="close-modal" id="close-forgot-password">&times;</span>
-        <h2>Reset Password</h2>
-        <form id="forgot-password-form">
-          <div class="form-group">
-            <label for="forgot-email">Enter your email address</label>
-            <input type="email" id="forgot-email" class="form-control" required autocomplete="email">
-          </div>
-          <div class="form-actions">
-            <button type="submit" class="btn btn-primary">Send Reset Link</button>
-            <button type="button" class="btn btn-secondary" id="cancel-forgot-password">Cancel</button>
-          </div>
-          <div id="forgot-password-success" class="feedback-message" style="display:none;color:#16a34a;margin-top:1rem;"></div>
-          <div id="forgot-password-error" class="feedback-message" style="display:none;color:#e53e3e;margin-top:1rem;"></div>
-        </form>
-      </div>
-    </div>
-    <style>
-      .modal { display:none; position:fixed; z-index:2000; left:0; top:0; width:100vw; height:100vh; background:rgba(30,41,59,0.25); backdrop-filter:blur(2px); align-items:center; justify-content:center; }
-      .modal-content { background:#fff; border-radius:1.25rem; margin:5% auto; padding:2.5rem 2rem 2rem 2rem; box-shadow:0 8px 32px 0 rgba(99,102,241,0.08); max-width:400px; width:95%; position:relative; }
-      .close-modal { position:absolute; top:1.2rem; right:1.5rem; font-size:2rem; color:#888; cursor:pointer; transition:color 0.2s; z-index:10; }
-      .close-modal:hover { color:#6366F1; }
-      .modal h2 { margin-top:0; margin-bottom:1.5rem; font-size:1.35rem; font-weight:800; color:#6366F1; text-align:center; }
-      .modal .form-group { margin-bottom:1.2rem; }
-      .modal .form-group label { font-weight:600; color:#6366F1; font-size:1.08rem; margin-bottom:0.4rem; display:block; }
-      .modal .form-control { width:100%; padding:0.7rem 1rem; border:1.5px solid #e5e7eb; border-radius:0.6rem; background:#f8fafc; color:#222; font-size:1rem; }
-      .modal .form-actions { display:flex; gap:1rem; justify-content:flex-end; margin-top:1.5rem; }
-      .btn-secondary { background:#f3f4f6; color:#6366F1; border:1.5px solid #6366F1; border-radius:0.75rem; padding:0.95rem 1.5rem; font-weight:700; font-size:1.08rem; cursor:pointer; }
-      .btn-secondary:hover { background:#6366F1; color:#fff; }
-      .feedback-message { font-size:1rem; text-align:center; font-weight:600; }
-      @media (max-width:600px) { .modal-content { padding:1.2rem 0.5rem 1rem 0.5rem; max-width:98vw; } }
-    </style>
-    <script>
-      // Modal logic
-      const forgotPasswordModal = document.getElementById('forgot-password-modal');
-      const closeForgotPassword = document.getElementById('close-forgot-password');
-      const cancelForgotPassword = document.getElementById('cancel-forgot-password');
-      const forgotPasswordForm = document.getElementById('forgot-password-form');
-      const forgotEmail = document.getElementById('forgot-email');
-      const successMsg = document.getElementById('forgot-password-success');
-      const errorMsg = document.getElementById('forgot-password-error');
-      const forgotLink = document.getElementById('forgot-password-link');
-      function openForgotPasswordModal() {
-        forgotPasswordModal.style.display = 'block';
-        forgotPasswordForm.reset();
-        successMsg.style.display = 'none';
-        errorMsg.style.display = 'none';
-      }
-      function closeModal() {
-        forgotPasswordModal.style.display = 'none';
-        forgotPasswordForm.reset();
-        successMsg.style.display = 'none';
-        errorMsg.style.display = 'none';
-      }
-      if (forgotLink) {
-        forgotLink.addEventListener('click', function(e) {
-          e.preventDefault();
-          openForgotPasswordModal();
-        });
-      }
-      closeForgotPassword.addEventListener('click', closeModal);
-      cancelForgotPassword.addEventListener('click', closeModal);
-      window.addEventListener('click', (e) => {
-        if (e.target === forgotPasswordModal) closeModal();
-      });
-      forgotPasswordForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = forgotEmail.value.trim();
-        successMsg.style.display = 'none';
-        errorMsg.style.display = 'none';
-        try {
-          await firebase.auth().sendPasswordResetEmail(email);
-          successMsg.textContent = 'Password reset link sent! Check your email.';
-          successMsg.style.display = 'block';
-        } catch (error) {
-          errorMsg.textContent = error.message;
-          errorMsg.style.display = 'block';
-        }
-      });
-    </script>
 </body>
 </html> 
