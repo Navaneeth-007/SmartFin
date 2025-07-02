@@ -16,65 +16,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-// DOM Elements
-const profileButton = document.querySelector('.profile-button');
-const profileDropdown = document.querySelector('.dropdown-menu');
-const profileImage = document.querySelector('.profile-image');
-const profileName = document.querySelector('.profile-name');
-const dropdownProfileImage = document.querySelector('.dropdown-profile-image');
-const dropdownUsername = document.querySelector('.dropdown-username');
-const dropdownEmail = document.querySelector('.dropdown-email');
-const logoutButton = document.getElementById('logout-button');
-const notificationButton = document.querySelector('.notification-button');
-const notificationDropdown = document.querySelector('.notification-dropdown');
-const markAllReadButton = document.querySelector('.mark-all-read');
-const notificationBadge = document.querySelector('.notification-badge');
-const themeToggle = document.getElementById('theme-toggle');
-
-// Sample notifications data
-const sampleNotifications = [
-    {
-        id: 1,
-        title: 'Monthly Budget Update',
-        message: 'You have spent 75% of your monthly budget. ₹12,500 remaining.',
-        timestamp: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
-        read: false,
-        icon: 'fas fa-chart-pie'
-    },
-    {
-        id: 2,
-        title: 'Bill Payment Reminder',
-        message: 'Electricity bill of ₹2,500 is due in 3 days.',
-        timestamp: new Date(Date.now() - 7200000).toISOString(), // 2 hours ago
-        read: false,
-        icon: 'fas fa-bolt'
-    },
-    {
-        id: 3,
-        title: 'Savings Goal Achieved',
-        message: 'Congratulations! You have reached your emergency fund goal of ₹50,000.',
-        timestamp: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
-        read: true,
-        icon: 'fas fa-piggy-bank'
-    },
-    {
-        id: 4,
-        title: 'Investment Opportunity',
-        message: 'Your monthly SIP of ₹5,000 has been processed successfully.',
-        timestamp: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
-        read: true,
-        icon: 'fas fa-chart-line'
-    },
-    {
-        id: 5,
-        title: 'Spending Alert',
-        message: 'Your dining out expenses are 30% higher than last month.',
-        timestamp: new Date(Date.now() - 259200000).toISOString(), // 3 days ago
-        read: true,
-        icon: 'fas fa-utensils'
-    }
-];
-
 // Function to update active nav link
 function updateActiveNavLink() {
     const currentPath = window.location.pathname;
@@ -124,17 +65,6 @@ function updateProfileDisplay(user) {
             profileImage.style.display = 'none';
             dropdownProfileImage.style.display = 'none';
         }
-    } else {
-        // Default state when no user is logged in
-        profileName.textContent = 'Guest';
-        dropdownUsername.textContent = 'Guest';
-        dropdownEmail.textContent = 'guest@example.com';
-        profileInitial.textContent = 'G';
-        dropdownProfileInitial.textContent = 'G';
-        profileInitial.style.display = 'block';
-        dropdownProfileInitial.style.display = 'block';
-        profileImage.style.display = 'none';
-        dropdownProfileImage.style.display = 'none';
     }
 }
 
@@ -184,17 +114,30 @@ function formatTime(timestamp) {
     return date.toLocaleDateString();
 }
 
-// Initialize everything when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM loaded, initializing navbar...');
-    
+// Remove DOMContentLoaded wrapper and move all code into a named export function
+function initNavbar() {
+    // DOM Elements (move inside function)
+    const profileButton = document.querySelector('.profile-button');
+    const profileDropdown = document.querySelector('.dropdown-menu');
+    const profileImage = document.querySelector('.profile-image');
+    const profileName = document.querySelector('.profile-name');
+    const dropdownProfileImage = document.querySelector('.dropdown-profile-image');
+    const dropdownUsername = document.querySelector('.dropdown-username');
+    const dropdownEmail = document.querySelector('.dropdown-email');
+    const logoutButton = document.getElementById('logout-button');
+    const notificationButton = document.querySelector('.notification-button');
+    const notificationDropdown = document.querySelector('.notification-dropdown');
+    const markAllReadButton = document.querySelector('.mark-all-read');
+    const notificationBadge = document.querySelector('.notification-badge');
+    const themeToggle = document.getElementById('theme-toggle');
+
     // Initialize theme manager
     initializeThemeManager();
     setupThemeToggle();
-    
+
     // Update active nav link
     updateActiveNavLink();
-    
+
     // Handle logout
     if (logoutButton) {
         logoutButton.addEventListener('click', async () => {
@@ -206,10 +149,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-    
+
     // --- IMPROVEMENT 1: Close all dropdowns on page load ---
     document.querySelectorAll('.dropdown-menu, .notification-dropdown').forEach(drop => drop.classList.remove('show'));
-    
+
     // Profile dropdown toggle
     if (profileButton && profileDropdown) {
         profileButton.addEventListener('click', () => {
@@ -229,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
-    
+
     // --- IMPROVEMENT 4: Robust close on outside click ---
     document.addEventListener('click', (e) => {
         if (!e.target.closest('.notification-container')) {
@@ -243,7 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
-    
+
     // Notification functionality
     if (notificationButton && notificationDropdown) {
         notificationButton.addEventListener('click', (e) => {
@@ -256,10 +199,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-    
+
     // Initialize notifications
     renderNotifications();
-    
+
     // Handle notification item clicks
     document.addEventListener('click', (e) => {
         const notificationItem = e.target.closest('.notification-item');
@@ -272,7 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
-    
+
     // Handle mark all as read
     const markAllReadBtn = document.querySelector('.mark-all-read');
     if (markAllReadBtn) {
@@ -283,10 +226,12 @@ document.addEventListener('DOMContentLoaded', () => {
             renderNotifications();
         });
     }
-});
 
-// Listen for auth state changes
-onAuthStateChanged(auth, user => {
-    console.log('Auth state changed:', user);
-    updateProfileDisplay(user);
-}); 
+    // Listen for auth state changes
+    onAuthStateChanged(auth, user => {
+        console.log('Auth state changed:', user);
+        updateProfileDisplay(user);
+    });
+}
+
+export { initNavbar }; 

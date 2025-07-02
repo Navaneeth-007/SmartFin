@@ -1,11 +1,10 @@
 // DOM Elements
 const manualExpenseModal = document.getElementById('manual-expense-modal');
-const addManualBtn = document.getElementById('add-manual-btn');
+const addExpenseBtn = document.getElementById('add-expense-btn');
 const closeModalButtons = document.querySelectorAll('.close-modal');
 const uploadArea = document.getElementById('upload-area');
 const expenseTableBody = document.getElementById('expense-table-body');
 const monthSelect = document.getElementById('month-select');
-const yearSelect = document.getElementById('year-select');
 const categoryBreakdownModal = document.getElementById('category-breakdown-modal');
 const viewCategoryDetailsBtn = document.getElementById('view-category-details');
 const expenseForm = document.getElementById('manual-expense-form');
@@ -15,9 +14,9 @@ const user_id = 'PLACEHOLDER_USER_ID'; // TODO: Replace with real user id
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
-    // Add event listeners for modal buttons
-    if (addManualBtn) {
-        addManualBtn.addEventListener('click', () => openModal(manualExpenseModal));
+    // Add event listener for Add Expense button
+    if (addExpenseBtn) {
+        addExpenseBtn.addEventListener('click', () => openModal(manualExpenseModal));
     }
     
     // Add event listeners for close buttons
@@ -54,9 +53,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Initialize date selectors
-    initializeDateSelectors();
-
     // Fetch and display expenses
     fetchAndDisplayExpenses();
 
@@ -73,48 +69,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Initialize date selectors
-function initializeDateSelectors() {
-    const currentDate = new Date();
-    const currentYear = currentDate.getFullYear();
-    
-    // Set current month
-    if (monthSelect) {
-        monthSelect.value = currentDate.getMonth();
-        monthSelect.addEventListener('change', fetchAndDisplayExpenses);
-    }
-    
-    // Clear existing options
-    if (yearSelect) {
-        yearSelect.innerHTML = '';
-        
-        // Populate years (last 5 years)
-        for (let year = currentYear; year >= currentYear - 4; year--) {
-            const option = document.createElement('option');
-            option.value = year;
-            option.textContent = year;
-            yearSelect.appendChild(option);
-        }
-        
-        // Set current year
-        yearSelect.value = currentYear;
-        yearSelect.addEventListener('change', fetchAndDisplayExpenses);
-    }
-}
-
 // Fetch and display expenses
 async function fetchAndDisplayExpenses() {
     if (!expenseTableBody) return;
     expenseTableBody.innerHTML = '';
     const selectedMonth = monthSelect ? parseInt(monthSelect.value) : new Date().getMonth();
-    const selectedYear = yearSelect ? parseInt(yearSelect.value) : new Date().getFullYear();
     try {
         const res = await fetch(`/api/transactions/${user_id}`);
         const data = await res.json();
         const expenses = data.filter(t => t.type === 'expense');
         const filtered = expenses.filter(exp => {
             const d = new Date(exp.date);
-            return d.getMonth() === selectedMonth && d.getFullYear() === selectedYear;
+            return d.getMonth() === selectedMonth;
         });
         if (filtered.length === 0) {
             const row = document.createElement('tr');
@@ -173,7 +139,6 @@ if (expenseForm) {
 
 // Month/year change
 if (monthSelect) monthSelect.addEventListener('change', fetchAndDisplayExpenses);
-if (yearSelect) yearSelect.addEventListener('change', fetchAndDisplayExpenses);
 
 // Modal Functions
 function openModal(modal) {
