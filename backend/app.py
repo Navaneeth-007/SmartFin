@@ -8,6 +8,7 @@ from datetime import datetime
 MONGO_URI = 'mongodb+srv://navaneeth007:navaneeth007@cluster0.yfkkdys.mongodb.net/?tlsAllowInvalidCertificates=true'
 DB_NAME = 'finance_db'
 EXPENSES_COLLECTION = 'expenses'
+INCOMES_COLLECTION = 'incomes'
 
 # --- APP SETUP ---
 app = Flask(__name__)
@@ -77,36 +78,57 @@ def get_expenses(uid):
     expenses = list(db[EXPENSES_COLLECTION].find(query).sort('date', -1))
     return jsonify([serialize_expense(e) for e in expenses])
 
-@app.route('/api/transactions', methods=['POST'])
-def add_transaction():
-    db = get_db()
-    data = request.json
-    required = ['user_id', 'type', 'date', 'amount']
-    for field in required:
-        if field not in data:
-            return jsonify({'error': f'Missing field: {field}'}), 400
-    data['date'] = datetime.strptime(data['date'], '%Y-%m-%d')
-    data['user_id'] = ObjectId(data['user_id'])
-    db.transactions.insert_one(data)
-    return jsonify({'status': 'success'})
-
-@app.route('/api/transactions/<user_id>', methods=['GET'])
-def get_transactions(user_id):
-    db = get_db()
-    txns = list(db.transactions.find({'user_id': ObjectId(user_id)}).sort('date', 1))
-    return jsonify([serialize_txn(t) for t in txns])
-
-@app.route('/api/suggestions/<user_id>', methods=['GET'])
-def ai_suggestions(user_id):
-    db = get_db()
-    txns = list(db.transactions.find({'user_id': ObjectId(user_id)}).sort('date', 1))
-    suggestions = get_suggestions(txns)
-    return jsonify({'suggestions': suggestions})
 
 @app.route('/api/expenses/<expense_id>', methods=['DELETE'])
 def delete_expense(expense_id):
     db = get_db()
     result = db[EXPENSES_COLLECTION].delete_one({'_id': ObjectId(expense_id)})
+    if result.deleted_count == 1:
+        return jsonify({'status': 'success'})
+    else:
+        return jsonify({'status': 'not found'}), 404
+
+@app.route('/api/incomes', methods=['POST'])
+def add_income():
+    db = get_db()
+    data = request.json
+    required = ['uid', 'date', 'amount', 'source']
+    for field in required:
+        if field not in data:
+            return jsonify({'error': f'Missing field: {field}'}), 400
+    income = {
+        'uid': data['uid'],
+        'date': data['date'],
+        'amount': float(data['amount']),
+        'source': data['source']
+    }
+    db[INCOMES_COLLECTION].insert_one(income)
+    return jsonify({'status': 'success'})
+
+@app.route('/api/incomes/<uid>', methods=['GET'])
+def get_incomes(uid):
+    db = get_db()
+    month = request.args.get('month')
+    year = request.args.get('year')
+    query = {'uid': uid}
+    if month is not None and year is not None:
+        month = int(month) + 1
+        year = int(year)
+        query['$expr'] = {
+            '$and': [
+                { '$eq': [{ '$month': { '$dateFromString': { 'dateString': '$date' } } }, month] },
+                { '$eq': [{ '$year': { '$dateFromString': { 'dateString': '$date' } } }, year] }
+            ]
+        }
+    incomes = list(db[INCOMES_COLLECTION].find(query).sort('date', -1))
+    for inc in incomes:
+        inc['_id'] = str(inc['_id'])
+    return jsonify(incomes)
+
+@app.route('/api/incomes/<income_id>', methods=['DELETE'])
+def delete_income(income_id):
+    db = get_db()
+    result = db[INCOMES_COLLECTION].delete_one({'_id': ObjectId(income_id)})
     if result.deleted_count == 1:
         return jsonify({'status': 'success'})
     else:
