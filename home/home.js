@@ -1,176 +1,216 @@
 // Import Firebase modules
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js';
-import { getAuth } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
 import { auth } from '../firebase-config/firebase-config.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+// --- Utility for totals ---
+async function fetchTotal(type, uid, month, year) {
+    const url = type === 'income'
+        ? `http://127.0.0.1:5000/api/incomes/${uid}?month=${month}&year=${year}`
+        : `http://127.0.0.1:5000/api/expenses/${uid}?month=${month}&year=${year}`;
+    const res = await fetch(url);
+    const data = res.ok ? await res.json() : [];
+    return data.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+}
 
-// Update user name and current month
-function updateUserInfo() {
-    const userNameElement = document.getElementById('user-name');
-    const currentMonthElement = document.getElementById('current-month');
-    
-    // Get current month and year
+// --- Stats update ---
+async function updateStats(uid) {
+    const statCards = document.querySelectorAll('.stat-card');
+    let totalBalanceElem = null, statChangeElem = null;
+    let totalIncomeElem = null, totalExpenseElem = null;
+    statCards.forEach(card => {
+        const h3 = card.querySelector('h3');
+        if (h3 && h3.textContent.includes('Total Balance')) {
+            totalBalanceElem = card.querySelector('.stat-value');
+            statChangeElem = card.querySelector('.stat-change');
+        } else if (h3 && h3.textContent.includes('Total Income')) {
+            totalIncomeElem = card.querySelector('.stat-value');
+        } else if (h3 && h3.textContent.includes('Total Expenses')) {
+            totalExpenseElem = card.querySelector('.stat-value');
+        }
+    });
     const now = new Date();
-    const monthNames = ["January", "February", "March", "April", "May", "June",
-        "July", "August", "September", "October", "November", "December"
-    ];
-    const currentMonth = monthNames[now.getMonth()];
-    const currentYear = now.getFullYear();
-    
-    if (currentMonthElement) {
-        currentMonthElement.textContent = `${currentMonth} ${currentYear}`;
+    const month = now.getMonth();
+    const year = now.getFullYear();
+    const prevMonth = month === 0 ? 11 : month - 1;
+    const prevYear = month === 0 ? year - 1 : year;
+    // Current month totals
+    const [income, expense] = await Promise.all([
+        fetchTotal('income', uid, month, year),
+        fetchTotal('expense', uid, month, year)
+    ]);
+    const currentBalance = income - expense;
+    // Previous month totals
+    const [prevIncome, prevExpense] = await Promise.all([
+        fetchTotal('income', uid, prevMonth, prevYear),
+        fetchTotal('expense', uid, prevMonth, prevYear)
+    ]);
+    const prevBalance = prevIncome - prevExpense;
+    // Percent change
+    let percentChange = 0;
+    if (prevBalance !== 0) {
+        percentChange = ((currentBalance - prevBalance) / Math.abs(prevBalance)) * 100;
     }
-    
-    // Listen for auth state changes
-    onAuthStateChanged(auth, (user) => {
-        console.log('Auth state changed:', user); // Debug log
-        
-        if (user) {
-            // User is signed in
-            let displayName = 'User';
-            
-            if (user.displayName) {
-                displayName = user.displayName;
-            } else if (user.email) {
-                // Use email username if no display name
-                displayName = user.email.split('@')[0];
-            }
-            
-            console.log('Setting user name to:', displayName); // Debug log
-            
-            if (userNameElement) {
-                userNameElement.textContent = displayName;
-            } else {
-                console.error('User name element not found'); // Debug log
-            }
+    // Update UI
+    if (totalBalanceElem) totalBalanceElem.textContent = `₹${currentBalance.toLocaleString('en-IN')}`;
+    if (statChangeElem) {
+        if (percentChange >= 0) {
+            statChangeElem.innerHTML = `<i class=\"fas fa-arrow-up\"></i> ${percentChange.toFixed(1)}% from last month`;
+            statChangeElem.className = 'stat-change positive';
         } else {
-            // User is signed out
-            console.log('No user signed in'); // Debug log
-            if (userNameElement) {
-                userNameElement.textContent = 'User';
+            statChangeElem.innerHTML = `<i class=\"fas fa-arrow-down\"></i> ${Math.abs(percentChange).toFixed(1)}% from last month`;
+            statChangeElem.className = 'stat-change negative';
+        }
+    }
+    if (totalIncomeElem) totalIncomeElem.textContent = `₹${income.toLocaleString('en-IN')}`;
+    if (totalExpenseElem) totalExpenseElem.textContent = `₹${expense.toLocaleString('en-IN')}`;
+}
+
+// --- Chart.js: Overview (Income vs Expense Trend) ---
+let overviewChart = null;
+async function renderOverviewChart(uid) {
+    const ctx = document.getElementById('overview-chart');
+    if (!ctx) return;
+    const now = new Date();
+    const months = [];
+    const monthLabels = [];
+    for (let i = 3; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        months.push({ year: d.getFullYear(), month: d.getMonth() });
+        monthLabels.push(d.toLocaleString('default', { month: 'short', year: '2-digit' }));
+    }
+    // Fetch all incomes/expenses for user
+    const allIncomeRes = await fetch(`http://127.0.0.1:5000/api/incomes/${uid}`);
+    const allExpenseRes = await fetch(`http://127.0.0.1:5000/api/expenses/${uid}`);
+    const allIncomes = allIncomeRes.ok ? await allIncomeRes.json() : [];
+    const allExpenses = allExpenseRes.ok ? await allExpenseRes.json() : [];
+    // Aggregate by month
+    function sumByMonth(arr) {
+        const map = {};
+        arr.forEach(item => {
+            const d = new Date(item.date);
+            const key = `${d.getFullYear()}-${d.getMonth()}`;
+            if (!map[key]) map[key] = 0;
+            map[key] += Number(item.amount) || 0;
+        });
+        return map;
+    }
+    const incomeMap = sumByMonth(allIncomes);
+    const expenseMap = sumByMonth(allExpenses);
+    const incomeData = months.map(({ year, month }) => incomeMap[`${year}-${month}`] || 0);
+    const expenseData = months.map(({ year, month }) => expenseMap[`${year}-${month}`] || 0);
+    if (overviewChart) overviewChart.destroy();
+    overviewChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: monthLabels,
+            datasets: [
+                {
+                    label: 'Income',
+                    data: incomeData,
+                    borderColor: '#22c55e',
+                    backgroundColor: 'rgba(34,197,94,0.1)',
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 5,
+                    pointBackgroundColor: '#22c55e',
+                    pointBorderColor: '#fff',
+                    pointHoverRadius: 7
+                },
+                {
+                    label: 'Expense',
+                    data: expenseData,
+                    borderColor: '#f43f5e',
+                    backgroundColor: 'rgba(244,63,94,0.1)',
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 5,
+                    pointBackgroundColor: '#f43f5e',
+                    pointBorderColor: '#fff',
+                    pointHoverRadius: 7
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: true, position: 'top' },
+                tooltip: { enabled: true }
+            },
+            scales: {
+                x: { title: { display: true, text: 'Month' } },
+                y: { title: { display: true, text: 'Amount (₹)' }, beginAtZero: true }
             }
-            // Redirect to login if not authenticated
-            window.location.href = '/login/login.html';
         }
     });
 }
 
-// Function to initialize charts
-function initializeCharts() {
-    console.log('Initializing charts...'); // Debug log
-    console.log('Chart object available:', typeof Chart !== 'undefined'); // Debug log
-    
-    // Overview Chart (Line Chart)
-    const overviewCanvas = document.getElementById('overviewChart');
-    console.log('Overview canvas found:', !!overviewCanvas); // Debug log
-    
-    if (overviewCanvas) {
-        try {
-            const overviewChart = new Chart(overviewCanvas, {
-                type: 'line',
-                data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                    datasets: [{
-                        label: 'Income',
-                        data: [25000, 28000, 30000, 32000, 32500, 35000],
-                        borderColor: 'rgb(75, 192, 192)',
-                        tension: 0.1,
-                        fill: false
-                    }, {
-                        label: 'Expenses',
-                        data: [12000, 14000, 13000, 15000, 15200, 16000],
-                        borderColor: 'rgb(255, 99, 132)',
-                        tension: 0.1,
-                        fill: false
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        },
-                        title: {
-                            display: true,
-                            text: 'Income vs Expenses Trend'
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return '₹' + value.toLocaleString();
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-            console.log('Overview chart created successfully'); // Debug log
-        } catch (error) {
-            console.error('Error creating overview chart:', error); // Debug log
+// --- Chart.js: Monthly Breakdown (Current Month Expense Categories) ---
+let breakdownChart = null;
+async function renderMonthlyBreakdownChart(uid) {
+    const ctx = document.getElementById('monthly-breakdown-chart');
+    if (!ctx) return;
+    const now = new Date();
+    const month = now.getMonth();
+    const year = now.getFullYear();
+    const res = await fetch(`http://127.0.0.1:5000/api/expenses/${uid}?month=${month}&year=${year}`);
+    const expenses = res.ok ? await res.json() : [];
+    // Aggregate by category
+    const categoryTotals = {};
+    expenses.forEach(exp => {
+        if (!categoryTotals[exp.category]) categoryTotals[exp.category] = 0;
+        categoryTotals[exp.category] += Number(exp.amount) || 0;
+    });
+    const categories = Object.keys(categoryTotals);
+    const totals = Object.values(categoryTotals);
+    const colors = [
+        '#6366F1', '#06B6D4', '#F59E42', '#F43F5E', '#64748b', '#A855F7', '#22C55E', '#FBBF24', '#E11D48', '#0EA5E9'
+    ];
+    if (breakdownChart) breakdownChart.destroy();
+    breakdownChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: categories,
+            datasets: [{
+                data: totals,
+                backgroundColor: colors.slice(0, categories.length),
+                borderColor: '#fff',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: true, position: 'bottom' },
+                tooltip: { enabled: true }
+            }
         }
-    } else {
-        console.error('Overview chart canvas not found'); // Debug log
-    }
-
-    // Monthly Breakdown Chart (Doughnut Chart)
-    const breakdownCanvas = document.getElementById('monthlyBreakdownChart');
-    console.log('Breakdown canvas found:', !!breakdownCanvas); // Debug log
-    
-    if (breakdownCanvas) {
-        try {
-            const breakdownChart = new Chart(breakdownCanvas, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Housing', 'Food', 'Transport', 'Entertainment', 'Utilities', 'Others'],
-                    datasets: [{
-                        data: [5000, 3000, 2000, 1500, 2000, 1700],
-                        backgroundColor: [
-                            'rgb(255, 99, 132)',
-                            'rgb(54, 162, 235)',
-                            'rgb(255, 205, 86)',
-                            'rgb(75, 192, 192)',
-                            'rgb(153, 102, 255)',
-                            'rgb(255, 159, 64)'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'right',
-                        },
-                        title: {
-                            display: true,
-                            text: 'Expense Categories'
-                        }
-                    }
-                }
-            });
-            console.log('Breakdown chart created successfully'); // Debug log
-        } catch (error) {
-            console.error('Error creating breakdown chart:', error); // Debug log
-        }
-    } else {
-        console.error('Monthly breakdown chart canvas not found'); // Debug log
-    }
+    });
 }
 
-// Initialize when DOM is loaded
+// --- DOMContentLoaded: Set up everything ---
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM loaded, initializing...'); // Debug log
-    updateUserInfo();
-    
-    // Initialize charts after a short delay to ensure DOM is fully loaded
-    setTimeout(initializeCharts, 100);
+    // Set current month and year
+    const currentMonthElement = document.getElementById('current-month');
+    const now = new Date();
+    const monthNames = ["January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"];
+    const currentMonth = monthNames[now.getMonth()];
+    const currentYear = now.getFullYear();
+    if (currentMonthElement) {
+        currentMonthElement.textContent = `${currentMonth} ${currentYear}`;
+    }
+    // Set username and update stats/charts
+    const userNameElement = document.getElementById('user');
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            const displayName = user.displayName || user.email.split('@')[0];
+            if (userNameElement) userNameElement.textContent = displayName;
+            updateStats(user.uid);
+            renderOverviewChart(user.uid);
+            renderMonthlyBreakdownChart(user.uid);
+        } else {
+            if (userNameElement) userNameElement.textContent = 'User';
+            window.location.href = '/login/login.html';
+        }
+    });
 });

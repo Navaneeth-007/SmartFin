@@ -368,7 +368,7 @@ body {
 }
 
 .expense-list td {
-    color: var(--text-primary);
+    color: #6366F1;
     font-weight: 500;
     background: transparent;
 }
@@ -378,13 +378,58 @@ body {
     transition: background 0.2s;
 }
 
+.expense-list td.amount-cell {
+    color: var(--primary-color);
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+}
+
+.expense-list tr:nth-child(even) td {
+    background: var(--background-secondary);
+    color: #6366F1;
+}
+
 .expense-list td.category-cell {
     text-transform: capitalize;
+    font-weight: 600;
+}
+
+.expense-list td.date-cell {
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 1.01rem;
+    letter-spacing: 0.01em;
+}
+
+.expense-list td.description-cell {
+    color: var(--text-primary);
+    font-weight: 500;
+    font-size: 1.01rem;
+}
+
+.expense-list td.actions-cell .btn-danger {
+    background: var(--danger-color);
+    color: #fff;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 0.98rem;
+    padding: 0.5rem 1.1rem;
+    box-shadow: 0 2px 8px var(--shadow-color);
+    transition: background 0.2s, box-shadow 0.2s;
+}
+
+.expense-list td.actions-cell .btn-danger:hover {
+    background: #c0392b;
+    box-shadow: 0 4px 16px var(--shadow-color);
 }
 
 /* Date Filter */
 .date-filter {
     display: flex;
+    color: #6366F1;
     gap: 0.7rem;
     align-items: center;
     min-width: 120px;
@@ -572,13 +617,13 @@ body {
 /* AI Suggestions Styles */
 .ai-suggestions-container {
     background: var(--glass-background);
-    border-radius: 1rem;
-    padding: 1.5rem;
-    box-shadow: 0 4px 6px -1px var(--shadow-color);
+    border-radius: 1.25rem;
+    box-shadow: 0 4px 24px var(--shadow-color);
     border: 1px solid var(--glass-border);
-    backdrop-filter: blur(10px);
-    transition: all 0.3s ease;
-    margin-bottom: 1rem;
+    padding: 2.5rem 2rem 2rem 2rem;
+    margin-bottom: 2.5rem;
+    font-family: 'Inter', sans-serif;
+    animation: fadeInUp 1s;
 }
 
 .ai-suggestions-header {
@@ -592,13 +637,22 @@ body {
 
 .ai-suggestions-header i {
     font-size: 1.5rem;
-    color: var(--success-color);
+    color: var(--primary-color);
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .ai-suggestions-header h3 {
     font-size: 1.2rem;
-    font-weight: 600;
-    color: var(--text-primary);
+    font-weight: 700;
+    color: var(--primary-color);
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
 }
 
 .ai-suggestions-content {
@@ -610,21 +664,18 @@ body {
 .suggestion-item {
     display: flex;
     gap: 1rem;
-    padding: 1rem;
+    padding: 1.2rem 1rem;
     background: var(--background-secondary);
     border-radius: 0.75rem;
     transition: all 0.3s ease;
-    animation: slideIn 0.5s ease forwards;
-    opacity: 0;
+    box-shadow: 0 2px 8px var(--shadow-color);
+    align-items: flex-start;
 }
 
-.suggestion-item:nth-child(1) { animation-delay: 0.1s; }
-.suggestion-item:nth-child(2) { animation-delay: 0.2s; }
-.suggestion-item:nth-child(3) { animation-delay: 0.3s; }
-
 .suggestion-item:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 6px -1px var(--shadow-color);
+    background: var(--hover-color);
+    box-shadow: 0 4px 16px var(--shadow-color);
+    transform: translateY(-2px) scale(1.02);
 }
 
 .suggestion-icon {
@@ -634,24 +685,24 @@ body {
     width: 2.5rem;
     height: 2.5rem;
     border-radius: 0.5rem;
-    background: rgba(16, 185, 129, 0.1);
-}
-
-.suggestion-icon i {
+    background: var(--accent-gradient);
+    color: #fff;
     font-size: 1.25rem;
+    flex-shrink: 0;
 }
 
 .suggestion-text h4 {
     margin-bottom: 0.5rem;
-    color: var(--text-primary);
+    color: var(--primary-color);
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .suggestion-text p {
     color: var(--text-secondary);
-    font-size: 0.875rem;
+    font-size: 0.95rem;
     line-height: 1.5;
+    margin: 0;
 }
 
 .ai-suggestions-footer {
@@ -773,4 +824,10 @@ body {
 }
 #manual-expense-modal .btn-primary:hover {
     background: var(--primary-gradient);
+}
+
+@media (max-width: 900px) {
+    .ai-suggestions-container {
+        padding: 1.2rem 0.5rem 1rem 0.5rem;
+    }
 } 
