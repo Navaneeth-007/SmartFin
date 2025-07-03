@@ -36,8 +36,6 @@
                     <h3>Total Expenses</h3>
                     <p class="stat-value">₹15,200</p>
                     <p class="stat-change negative">
-                        <i class="fas fa-arrow-up"></i>
-                        5.1% from last month
                     </p>
                 </div>
             </div>
@@ -48,7 +46,6 @@
                 </div>
                 <div class="stat-info">
                     <h3>Category Breakdown</h3>
-                    <p class="stat-value">5 Categories</p>
                     <button id="view-category-details" class="btn btn-sm btn-secondary stat-change mt-half-rem">
                         <i class="fas fa-info-circle"></i>
                         View Details
@@ -62,11 +59,8 @@
                 </div>
                 <div class="stat-info">
                     <h3>Monthly Budget</h3>
-                    <p class="stat-value">₹20,000</p>
-                    <p class="stat-change positive">
-                        <i class="fas fa-check-circle"></i>
-                        Within budget
-                    </p>
+                    <p class="stat-value">₹<span id="monthly-budget-value">20,000</span> <button id="edit-budget-btn" class="btn-icon"><i class="fas fa-pen"></i></button></p>
+                    <p class="stat-change" id="budget-status"></p>
                 </div>
             </div>
         </div>
@@ -82,11 +76,11 @@
         <div class="charts-grid">
             <div class="chart-container glass-effect">
                 <h3>Expense Trend</h3>
-                <img src="/assets/images/expense-trend-chart.png" alt="Expense Trend Chart" class="chart-image">
+                <canvas id="expense-trend-chart" width="400" height="240"></canvas>
             </div>
             <div class="chart-container glass-effect">
                 <h3>Category Distribution</h3>
-                <img src="/assets/images/expense-category-chart.png" alt="Expense Category Chart" class="chart-image">
+                <canvas id="category-breakdown-chart" width="400" height="240"></canvas>
             </div>
         </div>
         
@@ -94,42 +88,10 @@
         <div class="ai-suggestions-container glass-effect">
             <div class="ai-suggestions-header">
                 <i class="fas fa-robot text-emerald-500"></i>
-                <h3 class="text-lg font-semibold">AI Expense Insights</h3>
+                <h3 class="text-lg font-semibold">AI Income Insights</h3>
             </div>
             <div class="ai-suggestions-content">
-                <div class="suggestion-item">
-                    <div class="suggestion-icon">
-                        <i class="fas fa-chart-line-down text-red-500"></i>
-                    </div>
-                    <div class="suggestion-text">
-                        <h4 class="font-medium">High Dining Out Expenses</h4>
-                        <p>Your dining out expenses have increased by 25% this month. Consider meal prepping to save up to ₹5,000 monthly.</p>
-                    </div>
-                </div>
-                <div class="suggestion-item">
-                    <div class="suggestion-icon">
-                        <i class="fas fa-bolt text-yellow-500"></i>
-                    </div>
-                    <div class="suggestion-text">
-                        <h4 class="font-medium">Energy Consumption Alert</h4>
-                        <p>Your electricity bill is 15% higher than last month. Try using energy-efficient appliances to reduce costs.</p>
-                    </div>
-                </div>
-                <div class="suggestion-item">
-                    <div class="suggestion-icon">
-                        <i class="fas fa-piggy-bank text-emerald-500"></i>
-                    </div>
-                    <div class="suggestion-text">
-                        <h4 class="font-medium">Savings Opportunity</h4>
-                        <p>You could save ₹3,000 monthly by switching to a more economical mobile plan.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="ai-suggestions-footer">
-                <button class="refresh-suggestions">
-                    <i class="fas fa-sync-alt"></i>
-                    Refresh Suggestions
-                </button>
+                <!-- Dynamic suggestions will be injected here by JS -->
             </div>
         </div>
     </div>
@@ -236,6 +198,24 @@
         </div>
     </div>
 
+    <!-- Edit Budget Modal -->
+    <div id="edit-budget-modal" class="modal">
+        <div class="modal-content glass-effect">
+            <span class="close-modal">&times;</span>
+            <h2>Edit Monthly Budget</h2>
+            <form id="edit-budget-form">
+                <div class="form-group">
+                    <label for="budget-input">Monthly Budget Amount</label>
+                    <input type="number" id="budget-input" class="form-control" min="0" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-secondary" id="cancel-budget-btn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script>
         // Load navigation bar
@@ -251,76 +231,6 @@
             .catch(error => console.error('Error loading navigation bar:', error));
     </script>
     <script type="module" src="expense.js"></script>
-    <script>
-        // AI Suggestions functionality
-        document.addEventListener('DOMContentLoaded', () => {
-            const container = document.querySelector('.ai-suggestions-container');
-            const refreshButton = container.querySelector('.refresh-suggestions');
-            const content = container.querySelector('.ai-suggestions-content');
-
-            const generateSuggestions = () => {
-                const categories = [
-                    { icon: 'fa-chart-line-down', color: 'text-red-500', title: 'High Spending Alert' },
-                    { icon: 'fa-bolt', color: 'text-yellow-500', title: 'Energy Consumption' },
-                    { icon: 'fa-piggy-bank', color: 'text-emerald-500', title: 'Savings Opportunity' },
-                    { icon: 'fa-utensils', color: 'text-orange-500', title: 'Food Expenses' },
-                    { icon: 'fa-car', color: 'text-blue-500', title: 'Transportation' },
-                    { icon: 'fa-shopping-bag', color: 'text-purple-500', title: 'Shopping Habits' }
-                ];
-
-                const messages = [
-                    'Your expenses in this category have increased by 25% this month.',
-                    'Consider switching to more economical alternatives to save up to ₹3,000 monthly.',
-                    'This expense category is taking up 15% of your monthly income.',
-                    'You could save ₹2,500 by making small changes to your spending habits.',
-                    'This category shows a consistent upward trend in your expenses.',
-                    'Your spending here is 20% higher than the average user in your income bracket.'
-                ];
-
-                const savings = [
-                    'Save up to ₹5,000 monthly',
-                    'Reduce costs by 15%',
-                    'Cut expenses by ₹3,000',
-                    'Save ₹2,500 per month',
-                    'Reduce spending by 20%',
-                    'Save up to ₹4,000 monthly'
-                ];
-
-                content.innerHTML = '';
-
-                for (let i = 0; i < 3; i++) {
-                    const category = categories[Math.floor(Math.random() * categories.length)];
-                    const message = messages[Math.floor(Math.random() * messages.length)];
-                    const saving = savings[Math.floor(Math.random() * savings.length)];
-
-                    const suggestion = document.createElement('div');
-                    suggestion.className = 'suggestion-item';
-                    suggestion.innerHTML = `
-                        <div class="suggestion-icon">
-                            <i class="fas ${category.icon} ${category.color}"></i>
-                        </div>
-                        <div class="suggestion-text">
-                            <h4 class="font-medium">${category.title}</h4>
-                            <p>${message} ${saving}.</p>
-                        </div>
-                    `;
-
-                    content.appendChild(suggestion);
-                }
-            };
-
-            generateSuggestions();
-
-            refreshButton.addEventListener('click', () => {
-                refreshButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing...';
-                
-                setTimeout(() => {
-                    generateSuggestions();
-                    refreshButton.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Suggestions';
-                }, 1000);
-            });
-        });
-    </script>
 </body>
 <footer>
     <div class="footer glass-effect">

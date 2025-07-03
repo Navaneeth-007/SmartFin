@@ -21,7 +21,7 @@
         <!-- Header -->
         <div class="header glass-effect">
             <div class="welcome-section">
-                <h1>Welcome back, <span class="highlight" id="user-name"></span></h1>
+                <h1>Welcome back, <span class="highlight" id="user">Name</span></h1>
                 <p class="subtitle">Here's your financial overview for <span id="current-month"> May 2025</span></p>
             </div>
         </div>
@@ -36,8 +36,6 @@
                     <h3>Total Balance</h3>
                     <p class="stat-value">₹45,678</p>
                     <p class="stat-change positive">
-                        <i class="fas fa-arrow-up"></i>
-                        12.5% from last month
                     </p>
                 </div>
             </div>
@@ -49,10 +47,6 @@
                 <div class="stat-info">
                     <h3>Total Income</h3>
                     <p class="stat-value">₹32,500</p>
-                    <p class="stat-change positive">
-                        <i class="fas fa-arrow-up"></i>
-                        8.2% from last month
-                    </p>
                 </div>
             </div>
             
@@ -63,10 +57,6 @@
                 <div class="stat-info">
                     <h3>Total Expenses</h3>
                     <p class="stat-value">₹15,200</p>
-                    <p class="stat-change negative">
-                        <i class="fas fa-arrow-up"></i>
-                        5.1% from last month
-                    </p>
                 </div>
             </div>
         </div>
@@ -75,11 +65,11 @@
         <div class="charts-grid">
             <div class="chart-container glass-effect">
                 <h3>Overview</h3>
-                <img src="/assets/images/overview-chart.png" alt="Financial Overview Chart" class="chart-image">
+                <canvas id="overview-chart" width="400" height="240"></canvas>
             </div>
             <div class="chart-container glass-effect">
                 <h3>Monthly Breakdown</h3>
-                <img src="/assets/images/monthly-breakdown-chart.png" alt="Monthly Breakdown Chart" class="chart-image">
+                <canvas id="monthly-breakdown-chart" width="400" height="240"></canvas>
             </div>
         </div>
     </div>
@@ -92,33 +82,7 @@
                 <h3>AI Financial Insights</h3>
             </div>
             <div class="ai-content">
-                <div class="suggestion-card">
-                    <div class="suggestion-icon">
-                        <i class="fas fa-lightbulb"></i>
-                    </div>
-                    <div class="suggestion-text">
-                        <h4>Smart Savings Tip</h4>
-                        <p>Based on your spending patterns, you could save up to ₹2,500 monthly by reducing dining out expenses by 30%.</p>
-                    </div>
-                </div>
-                <div class="suggestion-card">
-                    <div class="suggestion-icon">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    <div class="suggestion-text">
-                        <h4>Investment Opportunity</h4>
-                        <p>Your savings rate has increased by 15% this month. Consider investing ₹5,000 in a diversified mutual fund.</p>
-                    </div>
-                </div>
-                <div class="suggestion-card">
-                    <div class="suggestion-icon">
-                        <i class="fas fa-exclamation-triangle"></i>
-                    </div>
-                    <div class="suggestion-text">
-                        <h4>Spending Alert</h4>
-                        <p>Your entertainment expenses are 25% higher than last month. Consider setting a monthly budget limit.</p>
-                    </div>
-                </div>
+                <!-- Dynamic suggestions will be injected here by JS -->
             </div>
         </div>
     </div>
