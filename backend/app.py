@@ -9,6 +9,7 @@ MONGO_URI = 'mongodb+srv://navaneeth007:navaneeth007@cluster0.yfkkdys.mongodb.ne
 DB_NAME = 'finance_db'
 EXPENSES_COLLECTION = 'expenses'
 INCOMES_COLLECTION = 'incomes'
+BUDGETS_COLLECTION = 'budgets'
 
 # --- APP SETUP ---
 app = Flask(__name__)
@@ -78,7 +79,6 @@ def get_expenses(uid):
     expenses = list(db[EXPENSES_COLLECTION].find(query).sort('date', -1))
     return jsonify([serialize_expense(e) for e in expenses])
 
-
 @app.route('/api/expenses/<expense_id>', methods=['DELETE'])
 def delete_expense(expense_id):
     db = get_db()
@@ -92,7 +92,7 @@ def delete_expense(expense_id):
 def add_income():
     db = get_db()
     data = request.json
-    required = ['uid', 'date', 'amount', 'source']
+    required = ['uid', 'date', 'amount', 'source', 'description']
     for field in required:
         if field not in data:
             return jsonify({'error': f'Missing field: {field}'}), 400
@@ -100,7 +100,8 @@ def add_income():
         'uid': data['uid'],
         'date': data['date'],
         'amount': float(data['amount']),
-        'source': data['source']
+        'source': data['source'],
+        'description': data['description']
     }
     db[INCOMES_COLLECTION].insert_one(income)
     return jsonify({'status': 'success'})
@@ -133,6 +134,26 @@ def delete_income(income_id):
         return jsonify({'status': 'success'})
     else:
         return jsonify({'status': 'not found'}), 404
+
+@app.route('/api/budget/<uid>', methods=['GET'])
+def get_budget(uid):
+    db = get_db()
+    doc = db[BUDGETS_COLLECTION].find_one({'uid': uid})
+    if doc:
+        return jsonify({'uid': uid, 'amount': doc['amount']})
+    else:
+        return jsonify({'uid': uid, 'amount': 20000})
+
+@app.route('/api/budget', methods=['POST'])
+def set_budget():
+    db = get_db()
+    data = request.json
+    uid = data.get('uid')
+    amount = data.get('amount')
+    if not uid or amount is None:
+        return jsonify({'error': 'Missing uid or amount'}), 400
+    db[BUDGETS_COLLECTION].update_one({'uid': uid}, {'$set': {'amount': amount}}, upsert=True)
+    return jsonify({'status': 'success'})
 
 # --- AI SUGGESTION LOGIC ---
 def get_suggestions(transactions):

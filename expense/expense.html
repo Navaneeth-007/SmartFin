@@ -36,8 +36,6 @@
                     <h3>Total Expenses</h3>
                     <p class="stat-value">₹15,200</p>
                     <p class="stat-change negative">
-                        <i class="fas fa-arrow-up"></i>
-                        5.1% from last month
                     </p>
                 </div>
             </div>
@@ -48,7 +46,6 @@
                 </div>
                 <div class="stat-info">
                     <h3>Category Breakdown</h3>
-                    <p class="stat-value">5 Categories</p>
                     <button id="view-category-details" class="btn btn-sm btn-secondary stat-change mt-half-rem">
                         <i class="fas fa-info-circle"></i>
                         View Details
@@ -62,11 +59,8 @@
                 </div>
                 <div class="stat-info">
                     <h3>Monthly Budget</h3>
-                    <p class="stat-value">₹20,000</p>
-                    <p class="stat-change positive">
-                        <i class="fas fa-check-circle"></i>
-                        Within budget
-                    </p>
+                    <p class="stat-value">₹<span id="monthly-budget-value">20,000</span> <button id="edit-budget-btn" class="btn-icon"><i class="fas fa-pen"></i></button></p>
+                    <p class="stat-change" id="budget-status"></p>
                 </div>
             </div>
         </div>
@@ -82,11 +76,11 @@
         <div class="charts-grid">
             <div class="chart-container glass-effect">
                 <h3>Expense Trend</h3>
-                <img src="/assets/images/expense-trend-chart.png" alt="Expense Trend Chart" class="chart-image">
+                <canvas id="expense-trend-chart" width="400" height="240"></canvas>
             </div>
             <div class="chart-container glass-effect">
                 <h3>Category Distribution</h3>
-                <img src="/assets/images/expense-category-chart.png" alt="Expense Category Chart" class="chart-image">
+                <canvas id="category-breakdown-chart" width="400" height="240"></canvas>
             </div>
         </div>
         
@@ -233,6 +227,24 @@
                     <strong>Total:</strong> <span>₹15,800</span>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Edit Budget Modal -->
+    <div id="edit-budget-modal" class="modal">
+        <div class="modal-content glass-effect">
+            <span class="close-modal">&times;</span>
+            <h2>Edit Monthly Budget</h2>
+            <form id="edit-budget-form">
+                <div class="form-group">
+                    <label for="budget-input">Monthly Budget Amount</label>
+                    <input type="number" id="budget-input" class="form-control" min="0" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-secondary" id="cancel-budget-btn">Cancel</button>
+                </div>
+            </form>
         </div>
     </div>
 
