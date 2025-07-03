@@ -1,171 +1,219 @@
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js';
-import { getAuth, signOut } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js';
-import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc, query, where } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js';
-
-// Your Firebase configuration
-const firebaseConfig = {
-    apiKey: "AIzaSyDXK-0FKH1hC-LiEASaIWolvxqk-2MnbWI",
-    authDomain: "smartfin-40e30.firebaseapp.com",
-    projectId: "smartfin-40e30",
-    storageBucket: "smartfin-40e30.appspot.com",
-    messagingSenderId: "14976464670",
-    appId: "1:14976464670:web:98756ac774dc67b3613b0f"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
 // DOM Elements
-const userList = document.getElementById('userList');
-const userSearch = document.getElementById('userSearch');
+const userList = document.querySelector('.users-grid');
 const logoutBtn = document.getElementById('logoutBtn');
-const modal = document.getElementById('userActionModal');
-const closeModal = document.querySelector('.close');
-const disableUserBtn = document.getElementById('disableUserBtn');
-const deleteUserBtn = document.getElementById('deleteUserBtn');
-const modalUserEmail = document.getElementById('modalUserEmail');
-const modalUserStatus = document.getElementById('modalUserStatus');
+const userSearch = document.getElementById('userSearch');
 
-// Check admin session
-if (!sessionStorage.getItem('isAdmin')) {
-    window.location.href = 'admin-login.html';
+// Add User Modal Logic
+const addUserBtn = document.getElementById('addUserBtn');
+const addUserModal = document.getElementById('addUserModal');
+const closeAddUserModal = document.getElementById('closeAddUserModal');
+const addUserForm = document.getElementById('addUserForm');
+const addUserError = document.getElementById('addUserError');
+
+// Validate admin session
+if (!sessionStorage.getItem('adminLoggedIn')) {
+    window.location.href = '/admin/login/login.html';
 }
 
-// Set admin name
-document.getElementById('adminName').textContent = 'Admin';
-loadUsers();
-
-// Load users from Firebase
+// Fetch and display users from backend
 async function loadUsers() {
     try {
-        const usersSnapshot = await getDocs(collection(db, 'users'));
+        const res = await fetch('http://127.0.0.1:5000/admin/list-users');
+        const users = await res.json();
         userList.innerHTML = '';
-        
-        usersSnapshot.forEach((doc) => {
-            const userData = doc.data();
-            const userCard = createUserCard(doc.id, userData);
-            userList.appendChild(userCard);
-        });
-    } catch (error) {
-        console.error('Error loading users:', error);
-    }
-}
+        if (Array.isArray(users) && users.length > 0) {
+            // Create table
+            const table = document.createElement('table');
+            table.className = 'user-table';
+            table.innerHTML = `
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Joined Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            `;
+            const tbody = table.querySelector('tbody');
+            users.forEach(user => {
+                const row = document.createElement('tr');
+                const isDisabled = user.disabled;
+                row.innerHTML = `
+                    <td>${user.displayName || 'No name'}</td>
+                    <td>${user.email || 'No email'}</td>
+                    <td>${user.createdAt || 'N/A'}</td>
+                    <td>
+                        <button class="delete-user-btn" data-uid="${user.uid}">Delete</button>
+                        <button class="change-password-btn" data-uid="${user.uid}">Change Password</button>
+                        <button class="toggle-disable-btn" data-uid="${user.uid}">${isDisabled ? 'Enable' : 'Disable'}</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+            userList.appendChild(table);
 
-// Create user card element
-function createUserCard(userId, userData) {
-    const card = document.createElement('div');
-    card.className = 'user-card';
-    
-    card.innerHTML = `
-        <div class="user-info">
-            <div class="user-avatar">
-                <i class="fas fa-user"></i>
-            </div>
-            <div>
-                <h3>${userData.email || 'No email'}</h3>
-                <p>Status: ${userData.disabled ? 'Disabled' : 'Active'}</p>
-            </div>
-        </div>
-        <div class="user-actions">
-            <button class="action-btn btn-warning" onclick="openUserModal('${userId}', '${userData.email}', ${userData.disabled})">
-                <i class="fas fa-ban"></i>
-                ${userData.disabled ? 'Enable' : 'Disable'}
-            </button>
-            <button class="action-btn btn-danger" onclick="openUserModal('${userId}', '${userData.email}', ${userData.disabled})">
-                <i class="fas fa-trash"></i>
-                Delete
-            </button>
-        </div>
-    `;
-    
-    return card;
-}
+            // Add delete event listeners
+            document.querySelectorAll('.delete-user-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const uid = btn.getAttribute('data-uid');
+                    if (confirm('Are you sure you want to delete this user?')) {
+                        await deleteUser(uid);
+                        loadUsers(); // Refresh list
+                    }
+                });
+            });
 
-// Search functionality
-userSearch.addEventListener('input', (e) => {
-    const searchTerm = e.target.value.toLowerCase();
-    const userCards = document.querySelectorAll('.user-card');
-    
-    userCards.forEach(card => {
-        const email = card.querySelector('h3').textContent.toLowerCase();
-        card.style.display = email.includes(searchTerm) ? 'flex' : 'none';
-    });
-});
+            // Add change password event listeners
+            document.querySelectorAll('.change-password-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const uid = btn.getAttribute('data-uid');
+                    const newPassword = prompt('Enter new password for this user:');
+                    if (newPassword && newPassword.length >= 6) {
+                        await changeUserPassword(uid, newPassword);
+                        alert('Password changed successfully.');
+                    } else if (newPassword) {
+                        alert('Password must be at least 6 characters.');
+                    }
+                });
+            });
 
-// Modal functionality
-window.openUserModal = function(userId, email, isDisabled) {
-    modalUserEmail.textContent = email;
-    modalUserStatus.textContent = isDisabled ? 'Disabled' : 'Active';
-    modal.style.display = 'block';
-    
-    disableUserBtn.onclick = () => toggleUserStatus(userId, !isDisabled);
-    deleteUserBtn.onclick = () => deleteUser(userId);
-};
-
-closeModal.onclick = () => {
-    modal.style.display = 'none';
-};
-
-window.onclick = (e) => {
-    if (e.target === modal) {
-        modal.style.display = 'none';
-    }
-};
-
-// Toggle user status
-async function toggleUserStatus(userId, disable) {
-    try {
-        const userRef = doc(db, 'users', userId);
-        await updateDoc(userRef, {
-            disabled: disable
-        });
-        loadUsers();
-        modal.style.display = 'none';
-    } catch (error) {
-        console.error('Error updating user status:', error);
-    }
-}
-
-// Delete user
-async function deleteUser(userId) {
-    if (confirm('Are you sure you want to delete this user?')) {
-        try {
-            await deleteDoc(doc(db, 'users', userId));
-            loadUsers();
-            modal.style.display = 'none';
-        } catch (error) {
-            console.error('Error deleting user:', error);
+            // Add disable/enable event listeners
+            document.querySelectorAll('.toggle-disable-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const uid = btn.getAttribute('data-uid');
+                    const action = btn.textContent === 'Disable' ? 'disable' : 'enable';
+                    await toggleUserDisabled(uid, action === 'disable');
+                    loadUsers();
+                });
+            });
+        } else {
+            userList.innerHTML = '<p>No users found.</p>';
         }
+    } catch (err) {
+        console.error('Error loading users:', err);
+        userList.innerHTML = '<p>Error fetching users.</p>';
     }
 }
 
-// Update logout functionality
-logoutBtn.addEventListener('click', () => {
-    sessionStorage.removeItem('isAdmin');
-    window.location.href = 'admin-login.html';
-});
-
-// AI Status Monitoring
-function updateAIStatus() {
-    // This is a placeholder for actual AI status monitoring
-    // In a real application, you would connect to your AI service's API
-    const statusIndicator = document.querySelector('.status-indicator');
-    const metrics = document.querySelectorAll('.metric-card p');
-    
-    // Simulate status updates
-    setInterval(() => {
-        const isOnline = Math.random() > 0.1; // 90% chance of being online
-        statusIndicator.className = `status-indicator ${isOnline ? 'online' : 'offline'}`;
-        statusIndicator.innerHTML = `<i class="fas fa-circle"></i> ${isOnline ? 'Online' : 'Offline'}`;
-        
-        // Update metrics
-        metrics[0].textContent = `${(Math.random() * 0.5 + 0.5).toFixed(1)}s avg`;
-        metrics[1].textContent = `${(Math.random() * 2 + 97).toFixed(1)}%`;
-        metrics[2].textContent = `${(Math.random() * 0.2 + 99.7).toFixed(1)}%`;
-    }, 5000);
+// Delete user function
+async function deleteUser(uid) {
+    try {
+        const res = await fetch(`http://127.0.0.1:5000/admin/delete-user/${uid}`, { method: 'DELETE' });
+        const data = await res.json();
+        if (!data.success) {
+            alert('Failed to delete user.');
+        }
+    } catch (err) {
+        alert('Error deleting user.');
+    }
 }
 
-// Start AI status monitoring
-updateAIStatus(); 
+// Change user password function
+async function changeUserPassword(uid, newPassword) {
+    try {
+        const res = await fetch(`http://127.0.0.1:5000/admin/change-password/${uid}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password: newPassword })
+        });
+        const data = await res.json();
+        if (!data.success) {
+            alert('Failed to change password.');
+        }
+    } catch (err) {
+        alert('Error changing password.');
+    }
+}
+
+// Toggle user disabled status
+async function toggleUserDisabled(uid, disabled) {
+    try {
+        const res = await fetch(`http://127.0.0.1:5000/admin/toggle-disable/${uid}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ disabled })
+        });
+        const data = await res.json();
+        if (!data.success) {
+            alert('Failed to update user status.');
+        }
+    } catch (err) {
+        alert('Error updating user status.');
+    }
+}
+
+// Run on load
+loadUsers();
+
+// Logout
+logoutBtn.addEventListener('click', () => {
+    sessionStorage.removeItem('adminLoggedIn');
+    window.location.href = '/admin/login/login.html';
+});
+
+// Add User Modal Logic
+addUserBtn.addEventListener('click', () => {
+    addUserModal.style.display = 'block';
+    addUserError.textContent = '';
+    addUserForm.reset();
+});
+closeAddUserModal.addEventListener('click', () => {
+    addUserModal.style.display = 'none';
+});
+window.addEventListener('click', (e) => {
+    if (e.target === addUserModal) {
+        addUserModal.style.display = 'none';
+    }
+});
+
+addUserForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    addUserError.textContent = '';
+    const name = document.getElementById('newUserName').value.trim();
+    const email = document.getElementById('newUserEmail').value.trim();
+    const password = document.getElementById('newUserPassword').value;
+    try {
+        const res = await fetch('http://127.0.0.1:5000/admin/create-user', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, password })
+        });
+        const data = await res.json();
+        if (data.success) {
+            addUserModal.style.display = 'none';
+            loadUsers();
+        } else {
+            addUserError.textContent = data.error || 'Failed to create user.';
+        }
+    } catch (err) {
+        addUserError.textContent = 'Error creating user.';
+    }
+});
+
+// Load sidebar component
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('../components/sidebar.html')
+        .then(res => res.text())
+        .then(html => {
+            document.getElementById('sidebar-container').innerHTML = html;
+            // Set active nav-item
+            const path = window.location.pathname;
+            document.querySelectorAll('.nav-item').forEach(link => {
+                link.classList.remove('active');
+                if ((path.includes('dashboard') && link.dataset.section === 'users') ||
+                    (path.includes('ai-status') && link.dataset.section === 'ai')) {
+                    link.classList.add('active');
+                }
+            });
+            // Attach logout event
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function() {
+                    window.location.href = '/admin/login/login.html';
+                });
+            }
+        });
+});

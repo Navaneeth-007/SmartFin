@@ -153,4 +153,29 @@ logoutBtn.addEventListener('click', async () => {
 });
 
 // Initialize charts when the page loads
-document.addEventListener('DOMContentLoaded', initializeCharts); 
+document.addEventListener('DOMContentLoaded', initializeCharts);
+
+// Load sidebar component
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('../components/sidebar.html')
+        .then(res => res.text())
+        .then(html => {
+            document.getElementById('sidebar-container').innerHTML = html;
+            // Set active nav-item
+            const path = window.location.pathname;
+            document.querySelectorAll('.nav-item').forEach(link => {
+                link.classList.remove('active');
+                if ((path.includes('dashboard') && link.dataset.section === 'users') ||
+                    (path.includes('ai-status') && link.dataset.section === 'ai')) {
+                    link.classList.add('active');
+                }
+            });
+            // Attach logout event
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function() {
+                    window.location.href = '/admin/login/login.html';
+                });
+            }
+        });
+}); 

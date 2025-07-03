@@ -6,6 +6,7 @@
     <meta name="referrer" content="no-referrer">
     <title>SmartFin - Admin Dashboard</title>
     <link rel="stylesheet" href="/shared/theme.css">
+    <link rel="stylesheet" href="../components/sidebar.css">
     <link rel="stylesheet" href="dashboard.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <!-- Firebase SDK -->
@@ -17,7 +18,8 @@
 </head>
 <body>
     <div class="dashboard-container">
-        <!-- Sidebar -->
+        <!-- Sidebar Include -->
+        <!--#include file="../components/sidebar.html" -->
         <aside class="sidebar glass-effect">
             <div class="sidebar-header">
                 <div class="brand-logo">
@@ -26,11 +28,11 @@
                 </div>
             </div>
             <nav class="sidebar-nav">
-                <a href="../dashboard/dashboard.html" class="nav-item active" data-section="users">
+                <a href="../dashboard/dashboard.html" class="nav-item" id="nav-users">
                     <i class="fas fa-users"></i>
                     <span>User Management</span>
                 </a>
-                <a href="../ai-status/aistatus.html" class="nav-item" data-section="ai">
+                <a href="../ai-status/aistatus.html" class="nav-item" id="nav-ai">
                     <i class="fas fa-robot"></i>
                     <span>AI Status</span>
                 </a>
@@ -42,8 +44,6 @@
                 </button>
             </div>
         </aside>
-
-        <!-- Main Content -->
         <main class="main-content">
             <header class="content-header glass-effect">
                 <div class="header-left">
@@ -51,130 +51,49 @@
                     <p class="welcome-message">Welcome to the SmartFin admin panel</p>
                 </div>
             </header>
-
-            <!-- Dashboard Content -->
             <div class="dashboard-content">
-                <!-- Users Section -->
                 <section id="users" class="dashboard-section active">
                     <div class="section-header">
                         <h2>User Management</h2>
-                        <button class="btn btn-primary" id="addUserBtn">
-                            <i class="fas fa-plus"></i>
-                            Add New User
-                        </button>
+                    </div>
+                    <div class="user-actions">
+                        <button id="addUserBtn" class="btn btn-primary">Add New User + </button>
+                    </div>
+                    <div id="addUserModal" class="modal" style="display:none;">
+                        <div class="modal-content">
+                            <span class="close" id="closeAddUserModal">&times;</span>
+                            <h2>Add New User</h2>
+                            <form id="addUserForm">
+                                <div class="form-group">
+                                    <label for="newUserName">Name</label>
+                                    <input type="text" id="newUserName" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="newUserEmail">Email</label>
+                                    <input type="email" id="newUserEmail" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="newUserPassword">Password</label>
+                                    <input type="password" id="newUserPassword" class="form-control" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Create User</button>
+                            </form>
+                            <div id="addUserError" class="error-message"></div>
+                        </div>
                     </div>
                     <div class="users-grid">
-                        <!-- User cards will be dynamically added here -->
-                    </div>
-                </section>
-
-                <!-- AI Status Section -->
-                <section id="ai" class="dashboard-section">
-                    <div class="section-header">
-                        <h2>AI System Status</h2>
-                        <div class="ai-status">
-                            <span class="status-indicator online"></span>
-                            <span class="status-text">System Online</span>
-                        </div>
-                    </div>
-                    <div class="ai-metrics">
-                        <div class="metric-card glass-effect">
-                            <i class="fas fa-brain"></i>
-                            <div class="metric-info">
-                                <h3>Model Status</h3>
-                                <p>Active</p>
-                            </div>
-                        </div>
-                        <div class="metric-card glass-effect">
-                            <i class="fas fa-tachometer-alt"></i>
-                            <div class="metric-info">
-                                <h3>Response Time</h3>
-                                <p>0.5s</p>
-                            </div>
-                        </div>
-                        <div class="metric-card glass-effect">
-                            <i class="fas fa-memory"></i>
-                            <div class="metric-info">
-                                <h3>Memory Usage</h3>
-                                <p>45%</p>
-                            </div>
-                        </div>
-                        <div class="metric-card glass-effect">
-                            <i class="fas fa-server"></i>
-                            <div class="metric-info">
-                                <h3>API Status</h3>
-                                <p>Healthy</p>
-                            </div>
-                        </div>
+                        <!-- User table will be rendered here by JS -->
                     </div>
                 </section>
             </div>
+            <footer>
+                <div class="footer glass-effect">
+                    <p>&copy; Developed by Navaneeth</p>
+                </div>
+            </footer>
         </main>
     </div>
-
-    <!-- Add User Modal -->
-    <div id="addUserModal" class="modal">
-        <div class="modal-content glass-effect">
-            <div class="modal-header">
-                <h2>Add New User</h2>
-                <button class="close-modal">&times;</button>
-            </div>
-            <form id="addUserForm">
-                <div class="form-group">
-                    <label for="newUserEmail">Email</label>
-                    <input type="email" id="newUserEmail" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label for="newUserPassword">Password</label>
-                    <input type="password" id="newUserPassword" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label for="newUserRole">Role</label>
-                    <select id="newUserRole" class="form-control" required>
-                        <option value="user">User</option>
-                        <option value="premium">Premium User</option>
-                    </select>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" id="cancelAddUser">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Add User</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- User Action Modal -->
-    <div id="userActionModal" class="modal">
-        <div class="modal-content glass-effect">
-            <span class="close">&times;</span>
-            <h2>User Actions</h2>
-            <div class="modal-body">
-                <div class="user-info">
-                    <p><strong>Email:</strong> <span id="modalUserEmail"></span></p>
-                    <p><strong>Status:</strong> <span id="modalUserStatus"></span></p>
-                </div>
-                <div class="action-buttons">
-                    <button id="disableUserBtn" class="btn-warning">
-                        <i class="fas fa-ban"></i>
-                        Disable User
-                    </button>
-                    <button id="deleteUserBtn" class="btn-danger">
-                        <i class="fas fa-trash"></i>
-                        Delete User
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Footer -->
-    <footer>
-        <div class="footer glass-effect">
-            <p>&copy; Developed by Navaneeth</p>
-        </div>
-    </footer>
-
-    <script type="module" src="dashboard.js"></script>
+    <script src="../components/sidebar.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         var logoutBtn = document.getElementById('logoutBtn');
@@ -185,5 +104,6 @@
         }
     });
     </script>
+    <script src="dashboard.js"></script>
 </body>
 </html> 
