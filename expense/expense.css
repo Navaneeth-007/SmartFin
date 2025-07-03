@@ -4,6 +4,7 @@
     --primary-gradient: linear-gradient(90deg, #6366F1 0%, #A855F7 100%);
     --accent-color: #06B6D4;
     --accent-gradient: linear-gradient(90deg, #F59E42 0%, #F43F5E 100%);
+    --secondary-color: #ad62f2;
     --background-primary: #f8fafc;
     --background-secondary: #e0e7ef;
     --glass-background: rgba(255,255,255,0.85);
@@ -202,7 +203,7 @@ body {
 }
 
 .btn-danger, .btn.btn-sm.btn-danger {
-    background: var(--danger-color);
+    background: #e3342f;
     color: #fff;
     border: none;
     transition: background 0.2s, color 0.2s;
@@ -621,4 +622,8 @@ tr:hover {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+.mt-half-rem {
+    margin-top: 0.5rem;
 } 
