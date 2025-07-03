@@ -47,6 +47,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const script = document.createElement('script');
             script.type = 'module';
             script.src = '/components/navbar.js';
+            script.onload = () => {
+                if (window.updateNotifications) window.updateNotifications();
+            };
             document.body.appendChild(script);
         })
         .catch(error => console.error('Error loading navigation bar:', error));
@@ -218,6 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
             expenseForm.reset();
             if (manualExpenseModal) manualExpenseModal.style.display = 'none';
             fetchAndDisplayExpenses();
+            if (window.updateNotifications) window.updateNotifications();
         });
     }
 
@@ -254,6 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     updateBudgetUI();
                     updateBudgetStatus();
                     closeModal(editBudgetModal);
+                    if (window.updateNotifications) window.updateNotifications();
                 } else {
                     alert('Failed to update budget.');
                 }
@@ -328,6 +333,7 @@ async function fetchAndDisplayExpenses() {
                             credentials: 'include'
                         });
                         fetchAndDisplayExpenses();
+                        if (window.updateNotifications) window.updateNotifications();
                     }
                 });
             });
