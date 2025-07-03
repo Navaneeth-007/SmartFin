@@ -3,6 +3,8 @@ from flask_cors import CORS
 from pymongo import MongoClient
 from bson import ObjectId
 from datetime import datetime
+import firebase_admin
+from firebase_admin import credentials, auth
 
 # --- CONFIG ---
 MONGO_URI = 'mongodb+srv://navaneeth007:navaneeth007@cluster0.yfkkdys.mongodb.net/?tlsAllowInvalidCertificates=true'
@@ -40,6 +42,11 @@ def serialize_txn(txn):
     txn['user_id'] = str(txn['user_id'])
     txn['date'] = txn['date'].strftime('%Y-%m-%d') if isinstance(txn['date'], datetime) else txn['date']
     return txn
+
+# --- FIREBASE ADMIN INITIALIZATION ---
+if not firebase_admin._apps:
+    cred = credentials.Certificate('serviceAccountKey.json')  # Adjust path if needed
+    firebase_admin.initialize_app(cred)
 
 # --- API ENDPOINTS ---
 
@@ -83,10 +90,7 @@ def get_expenses(uid):
 def delete_expense(expense_id):
     db = get_db()
     result = db[EXPENSES_COLLECTION].delete_one({'_id': ObjectId(expense_id)})
-    if result.deleted_count == 1:
-        return jsonify({'status': 'success'})
-    else:
-        return jsonify({'status': 'not found'}), 404
+    return jsonify({'status': 'success' if result.deleted_count == 1 else 'not found'}), 200 if result.deleted_count else 404
 
 @app.route('/api/incomes', methods=['POST'])
 def add_income():
@@ -130,19 +134,13 @@ def get_incomes(uid):
 def delete_income(income_id):
     db = get_db()
     result = db[INCOMES_COLLECTION].delete_one({'_id': ObjectId(income_id)})
-    if result.deleted_count == 1:
-        return jsonify({'status': 'success'})
-    else:
-        return jsonify({'status': 'not found'}), 404
+    return jsonify({'status': 'success' if result.deleted_count == 1 else 'not found'}), 200 if result.deleted_count else 404
 
 @app.route('/api/budget/<uid>', methods=['GET'])
 def get_budget(uid):
     db = get_db()
     doc = db[BUDGETS_COLLECTION].find_one({'uid': uid})
-    if doc:
-        return jsonify({'uid': uid, 'amount': doc['amount']})
-    else:
-        return jsonify({'uid': uid, 'amount': 20000})
+    return jsonify({'uid': uid, 'amount': doc['amount'] if doc else 20000})
 
 @app.route('/api/budget', methods=['POST'])
 def set_budget():
@@ -182,6 +180,69 @@ def get_suggestions(transactions):
         suggestions.append('Your finances look stable. Keep tracking your income and expenses!')
 
     return suggestions
+
+# --- ADMIN USER FETCH ENDPOINT ---
+@app.route('/admin/list-users', methods=['GET'])
+def list_users():
+    users = []
+    page = auth.list_users()
+    for user in page.iterate_all():
+        users.append({
+            'uid': user.uid,
+            'displayName': user.display_name or '',
+            'email': user.email or '',
+            'createdAt': datetime.fromtimestamp(user.user_metadata.creation_timestamp / 1000).strftime('%Y-%m-%d %H:%M:%S') if user.user_metadata and user.user_metadata.creation_timestamp else '',
+            'disabled': user.disabled
+        })
+    return jsonify(users)
+
+@app.route('/admin/delete-user/<uid>', methods=['DELETE'])
+def delete_user(uid):
+    try:
+        auth.delete_user(uid)
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
+
+@app.route('/admin/create-user', methods=['POST'])
+def create_user():
+    data = request.get_json()
+    name = data.get('name', '').strip()
+    email = data.get('email', '').strip()
+    password = data.get('password', '')
+    if not name or not email or not password:
+        return jsonify({'success': False, 'error': 'All fields are required.'}), 400
+    try:
+        user = auth.create_user(
+            email=email,
+            password=password,
+            display_name=name
+        )
+        return jsonify({'success': True, 'uid': user.uid})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
+
+@app.route('/admin/change-password/<uid>', methods=['POST'])
+def change_password(uid):
+    data = request.get_json()
+    password = data.get('password', '')
+    if not password or len(password) < 6:
+        return jsonify({'success': False, 'error': 'Password must be at least 6 characters.'}), 400
+    try:
+        auth.update_user(uid, password=password)
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
+
+@app.route('/admin/toggle-disable/<uid>', methods=['POST'])
+def toggle_disable(uid):
+    data = request.get_json()
+    disabled = data.get('disabled', False)
+    try:
+        auth.update_user(uid, disabled=disabled)
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
 
 # --- MAIN ---
 if __name__ == '__main__':
