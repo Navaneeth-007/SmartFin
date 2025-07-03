@@ -85,19 +85,6 @@ function updateActiveNavLink() {
     });
 }
 
-// Format notification time (if needed in future)
-function formatTime(timestamp) {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diff = now - date;
-    if (diff < 60000) return 'Just now';
-    if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
-    if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
-    return date.toLocaleDateString();
-}
-
-// Initialize everything
-// Only keep essential logic for nav/profile/theme
 
 document.addEventListener('DOMContentLoaded', () => {
     initializeThemeManager();

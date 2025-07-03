@@ -1,5 +1,6 @@
 import { auth } from '../firebase-config/firebase-config.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+import { generateExpenseAISuggestions } from '../shared/ai-insights.js';
 
 // DOM Elements
 const manualExpenseModal = document.getElementById('manual-expense-modal');
@@ -54,76 +55,6 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(error => console.error('Error loading navigation bar:', error));
 
-    // AI Suggestions functionality
-    const container = document.querySelector('.ai-suggestions-container');
-    if (container) {
-        const refreshButton = container.querySelector('.refresh-suggestions');
-        const content = container.querySelector('.ai-suggestions-content');
-
-        const generateSuggestions = () => {
-            const categories = [
-                { icon: 'fa-chart-line-down', color: 'text-red-500', title: 'High Spending Alert' },
-                { icon: 'fa-bolt', color: 'text-yellow-500', title: 'Energy Consumption' },
-                { icon: 'fa-piggy-bank', color: 'text-emerald-500', title: 'Savings Opportunity' },
-                { icon: 'fa-utensils', color: 'text-orange-500', title: 'Food Expenses' },
-                { icon: 'fa-car', color: 'text-blue-500', title: 'Transportation' },
-                { icon: 'fa-shopping-bag', color: 'text-purple-500', title: 'Shopping Habits' }
-            ];
-
-            const messages = [
-                'Your expenses in this category have increased by 25% this month.',
-                'Consider switching to more economical alternatives to save up to ₹3,000 monthly.',
-                'This expense category is taking up 15% of your monthly income.',
-                'You could save ₹2,500 by making small changes to your spending habits.',
-                'This category shows a consistent upward trend in your expenses.',
-                'Your spending here is 20% higher than the average user in your income bracket.'
-            ];
-
-            const savings = [
-                'Save up to ₹5,000 monthly',
-                'Reduce costs by 15%',
-                'Cut expenses by ₹3,000',
-                'Save ₹2,500 per month',
-                'Reduce spending by 20%',
-                'Save up to ₹4,000 monthly'
-            ];
-
-            content.innerHTML = '';
-
-            for (let i = 0; i < 3; i++) {
-                const category = categories[Math.floor(Math.random() * categories.length)];
-                const message = messages[Math.floor(Math.random() * messages.length)];
-                const saving = savings[Math.floor(Math.random() * savings.length)];
-
-                const suggestion = document.createElement('div');
-                suggestion.className = 'suggestion-item';
-                suggestion.innerHTML = `
-                    <div class="suggestion-icon">
-                        <i class="fas ${category.icon} ${category.color}"></i>
-                    </div>
-                    <div class="suggestion-text">
-                        <h4 class="font-medium">${category.title}</h4>
-                        <p>${message} ${saving}.</p>
-                    </div>
-                `;
-
-                content.appendChild(suggestion);
-            }
-        };
-
-        generateSuggestions();
-
-        if (refreshButton) {
-            refreshButton.addEventListener('click', () => {
-                refreshButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing...';
-                setTimeout(() => {
-                    generateSuggestions();
-                    refreshButton.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Suggestions';
-                }, 1000);
-            });
-        }
-    }
-
     // Add event listener for Add Expense button
     if (addExpenseBtn) {
         addExpenseBtn.addEventListener('click', () => {
@@ -147,6 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
             currentUid = user.uid;
             fetchAndDisplayExpenses();
             fetchAndRenderExpenseTrend();
+            renderExpenseAISuggestions();
         } else {
             // Optionally redirect to login
             currentUid = null;
@@ -222,6 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (manualExpenseModal) manualExpenseModal.style.display = 'none';
             fetchAndDisplayExpenses();
             if (window.updateNotifications) window.updateNotifications();
+            renderExpenseAISuggestions();
         });
     }
 
@@ -259,6 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     updateBudgetStatus();
                     closeModal(editBudgetModal);
                     if (window.updateNotifications) window.updateNotifications();
+                    renderExpenseAISuggestions();
                 } else {
                     alert('Failed to update budget.');
                 }
@@ -275,6 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
             fetchAndDisplayBudget();
             fetchAndDisplayExpenses();
             fetchAndRenderExpenseTrend();
+            renderExpenseAISuggestions();
         } else {
             currentUid = null;
         }
@@ -334,6 +269,7 @@ async function fetchAndDisplayExpenses() {
                         });
                         fetchAndDisplayExpenses();
                         if (window.updateNotifications) window.updateNotifications();
+                        renderExpenseAISuggestions();
                     }
                 });
             });
@@ -517,4 +453,49 @@ function renderCategoryBreakdownChart() {
             }
         }
     });
+}
+
+// Remove all static/random AI suggestion code and constants. Only use dynamic AI suggestions from ai-insights.js.
+// (No static categories/messages/savings arrays or generateSuggestions function remain.)
+async function renderExpenseAISuggestions() {
+    if (!currentUid) return;
+    // Fetch current month expenses
+    const month = getSelectedMonth();
+    const year = getSelectedYear();
+    const res = await fetch(`http://127.0.0.1:5000/api/expenses/${currentUid}?month=${month}&year=${year}`);
+    const expenses = res.ok ? await res.json() : [];
+    // Fetch last month expenses
+    let lastMonth = month - 1;
+    let lastYear = year;
+    if (lastMonth < 0) { lastMonth = 11; lastYear--; }
+    const resLast = await fetch(`http://127.0.0.1:5000/api/expenses/${currentUid}?month=${lastMonth}&year=${lastYear}`);
+    const lastMonthExpenses = resLast.ok ? await resLast.json() : [];
+    // Fetch budget
+    let budget = 0;
+    const resBudget = await fetch(`http://127.0.0.1:5000/api/budget/${currentUid}`);
+    if (resBudget.ok) {
+        const data = await resBudget.json();
+        budget = data.amount;
+    }
+    // Generate suggestions
+    const suggestions = generateExpenseAISuggestions(expenses, budget, lastMonthExpenses);
+    // Render
+    const content = document.querySelector('.ai-suggestions-content');
+    if (content) {
+        content.innerHTML = '';
+        suggestions.forEach(s => {
+            const div = document.createElement('div');
+            div.className = 'suggestion-item';
+            div.innerHTML = `
+                <div class="suggestion-icon">
+                    <i class="fas ${s.icon}"></i>
+                </div>
+                <div class="suggestion-text">
+                    <h4 class="font-medium">${s.title}</h4>
+                    <p>${s.text}</p>
+                </div>
+            `;
+            content.appendChild(div);
+        });
+    }
 }

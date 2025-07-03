@@ -1,4 +1,5 @@
 import { auth } from '../firebase-config/firebase-config.js';
+import { generateIncomeAISuggestions } from '../shared/ai-insights.js';
 
 let currentUid = null;
 const incomeTableBody = document.getElementById('income-table-body');
@@ -308,7 +309,45 @@ onAuthStateChanged(auth, (user) => {
     if (user) {
         currentUid = user.uid;
         refreshIncomeStatsAndTable();
+        renderIncomeAISuggestions();
     } else {
         currentUid = null;
     }
-}); 
+});
+
+// Remove static AI suggestions code and replace with dynamic
+async function renderIncomeAISuggestions() {
+    if (!currentUid) return;
+    // Fetch current month incomes
+    const month = getSelectedIncomeMonth();
+    const year = getSelectedIncomeYear();
+    const res = await fetch(`http://127.0.0.1:5000/api/incomes/${currentUid}?month=${month}&year=${year}`);
+    const incomes = res.ok ? await res.json() : [];
+    // Fetch last month incomes
+    let lastMonth = month - 1;
+    let lastYear = year;
+    if (lastMonth < 0) { lastMonth = 11; lastYear--; }
+    const resLast = await fetch(`http://127.0.0.1:5000/api/incomes/${currentUid}?month=${lastMonth}&year=${lastYear}`);
+    const lastMonthIncomes = resLast.ok ? await resLast.json() : [];
+    // Generate suggestions
+    const suggestions = generateIncomeAISuggestions(incomes, lastMonthIncomes);
+    // Render
+    const content = document.querySelector('.ai-suggestions-content');
+    if (content) {
+        content.innerHTML = '';
+        suggestions.forEach(s => {
+            const div = document.createElement('div');
+            div.className = 'suggestion-item';
+            div.innerHTML = `
+                <div class="suggestion-icon">
+                    <i class="fas ${s.icon}"></i>
+                </div>
+                <div class="suggestion-text">
+                    <h4 class="font-medium">${s.title}</h4>
+                    <p>${s.text}</p>
+                </div>
+            `;
+            content.appendChild(div);
+        });
+    }
+} 

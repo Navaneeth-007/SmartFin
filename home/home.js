@@ -1,6 +1,7 @@
 // Import Firebase modules
 import { auth } from '../firebase-config/firebase-config.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
+import { generateHomeAISuggestions } from '../shared/ai-insights.js';
 
 // --- Utility for totals ---
 async function fetchTotal(type, uid, month, year) {
@@ -208,9 +209,53 @@ document.addEventListener('DOMContentLoaded', () => {
             updateStats(user.uid);
             renderOverviewChart(user.uid);
             renderMonthlyBreakdownChart(user.uid);
+            renderHomeAISuggestions(user.uid);
         } else {
             if (userNameElement) userNameElement.textContent = 'User';
             window.location.href = '/login/login.html';
         }
     });
 });
+
+// Remove static AI suggestions code and replace with dynamic
+async function renderHomeAISuggestions(currentUid) {
+    if (!currentUid) return;
+    // Get current month
+    const now = new Date();
+    const month = now.getMonth();
+    const year = now.getFullYear();
+    // Fetch expenses
+    const resExp = await fetch(`http://127.0.0.1:5000/api/expenses/${currentUid}?month=${month}&year=${year}`);
+    const expenses = resExp.ok ? await resExp.json() : [];
+    // Fetch incomes
+    const resInc = await fetch(`http://127.0.0.1:5000/api/incomes/${currentUid}?month=${month}&year=${year}`);
+    const incomes = resInc.ok ? await resInc.json() : [];
+    // Fetch budget
+    let budget = 0;
+    const resBudget = await fetch(`http://127.0.0.1:5000/api/budget/${currentUid}`);
+    if (resBudget.ok) {
+        const data = await resBudget.json();
+        budget = data.amount;
+    }
+    // Generate suggestions
+    const suggestions = generateHomeAISuggestions(expenses, incomes, budget);
+    // Render
+    const content = document.querySelector('.ai-content');
+    if (content) {
+        content.innerHTML = '';
+        suggestions.forEach(s => {
+            const div = document.createElement('div');
+            div.className = 'suggestion-card';
+            div.innerHTML = `
+                <div class="suggestion-icon">
+                    <i class="fas ${s.icon}"></i>
+                </div>
+                <div class="suggestion-text">
+                    <h4>${s.title}</h4>
+                    <p>${s.text}</p>
+                </div>
+            `;
+            content.appendChild(div);
+        });
+    }
+}
