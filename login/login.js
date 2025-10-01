@@ -9,7 +9,7 @@ const emailInput = document.getElementById('email');
 const passwordInput = document.getElementById('password');
 const googleSignInButton = document.getElementById('google-signin');
 
-// Theme Toggle Functionality
+
 document.addEventListener('DOMContentLoaded', function() {
     initializeTheme();
     setupThemeToggle();
@@ -105,7 +105,7 @@ window.addEventListener('load', () => {
     }
 });
 
-// Add animation to the login card
+//Animation to the login card
 document.addEventListener('DOMContentLoaded', () => {
     const loginCard = document.querySelector('.login-card');
     loginCard.style.opacity = '0';

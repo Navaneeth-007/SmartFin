@@ -1,5 +1,4 @@
-// ai-insights.js
-// Shared AI Insights generator for SmartFin
+
 
 /**
  * Generate AI suggestions for the expense page.
@@ -85,7 +84,6 @@ export function generateIncomeAISuggestions(incomes, lastMonthIncomes) {
         }
     }
     // 3. High savings rate (if income > 0 and savings > 30%)
-    // This can be calculated on the home page with both incomes and expenses
     if (suggestions.length === 0) {
         suggestions.push({
             icon: 'fa-chart-line-up text-emerald-500',

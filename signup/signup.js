@@ -15,13 +15,8 @@ const passwordInput = document.getElementById('password');
 const confirmPasswordInput = document.getElementById('confirm-password');
 const googleSignUpButton = document.getElementById('google-signup');
 
-// Error elements
-const nameError = document.getElementById('name-error');
-const emailError = document.getElementById('email-error');
-const passwordError = document.getElementById('password-error');
-const confirmPasswordError = document.getElementById('confirm-password-error');
 
-// Theme Toggle Functionality
+
 document.addEventListener('DOMContentLoaded', function() {
     initializeTheme();
 
@@ -35,10 +30,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
             passwordInput.setAttribute('type', type);
             
-            // Toggle the eye icon
-            const icon = this.querySelector('i');
-            icon.classList.toggle('fa-eye');
-            icon.classList.toggle('fa-eye-slash');
         });
     }
     
@@ -48,10 +39,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
             confirmPasswordInput.setAttribute('type', type);
             
-            // Toggle the eye icon
-            const icon = this.querySelector('i');
-            icon.classList.toggle('fa-eye');
-            icon.classList.toggle('fa-eye-slash');
         });
     }
 });
@@ -140,7 +127,7 @@ if (googleSignUpButton) {
     });
 }
 
-// Add animation to the signup card
+//Animation to the signup card
 document.addEventListener('DOMContentLoaded', () => {
     const signupCard = document.querySelector('.signup-card');
     signupCard.style.opacity = '0';

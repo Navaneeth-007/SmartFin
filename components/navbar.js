@@ -1,21 +1,7 @@
 // Import Firebase modules
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js';
-import { getAuth, signOut } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js';
+import { getAuth, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
 import { initializeThemeManager, setupThemeToggle } from '../shared/theme-manager.js';
 import { auth } from '../firebase-config/firebase-config.js';
-
-// Initialize Firebase
-const firebaseConfig = {
-    apiKey: "AIzaSyDqXpYwQZQZQZQZQZQZQZQZQZQZQZQZQZQ",
-    authDomain: "smartfin-12345.firebaseapp.com",
-    projectId: "smartfin-12345",
-    storageBucket: "smartfin-12345.appspot.com",
-    messagingSenderId: "123456789012",
-    appId: "1:123456789012:web:1234567890123456789012"
-};
-
-const app = initializeApp(firebaseConfig);
-const authInstance = getAuth(app);
 
 // --- Simple Notification Logic ---
 async function updateNotifications() {
@@ -115,4 +101,16 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.href = '/profile/profile.html';
         });
     }
+
+    const userNameElement = document.getElementById('user');
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            const displayName = user.displayName || user.email.split('@')[0];
+            if (userNameElement) userNameElement.textContent = displayName;
+            updateStats(user.uid);
+
+        }
+    });
+    updateNavbarUsername();
+    window.updateNavbarUsername = updateNavbarUsername;
 });

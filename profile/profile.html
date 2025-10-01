@@ -89,6 +89,9 @@
                 const script = document.createElement('script');
                 script.type = 'module';
                 script.src = '/components/navbar.js';
+                script.onload = () => {
+                    if (window.updateNavbarUsername) window.updateNavbarUsername();
+                };
                 document.body.appendChild(script);
             });
     </script>

@@ -1,6 +1,5 @@
 // Theme configuration
 export const initializeTheme = () => {
-    // Check for saved theme preference or use system preference
     const savedTheme = localStorage.getItem('theme');
     const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     
@@ -24,7 +23,7 @@ export const initializeTheme = () => {
     });
 };
 
-// Theme toggle functionality
+
 export const setupThemeToggle = () => {
     const themeToggle = document.getElementById('theme-toggle');
     if (!themeToggle) return;
