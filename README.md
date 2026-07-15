@@ -1,155 +1,114 @@
-# SmartFin
+# 💰 SmartFin
 
-SmartFin is a personal finance web app for tracking income, expenses, and budget usage, with Firebase-based authentication, a Flask backend, and MongoDB persistence. The project includes separate user and admin experiences, finance dashboards, and shared UI components for theme and navigation handling.
+SmartFin is a full-stack personal finance management web application that enables users to track income, expenses, and budgets through an intuitive dashboard. It uses **Firebase Authentication** for secure user management, **Flask** as the backend API, and **MongoDB** for persistent data storage.
 
-## Overview
+The application provides separate interfaces for **users** and **administrators**, offering comprehensive financial tracking, analytics, and system management features.
 
-The app is organized as a static front end with supporting backend APIs. Users can sign up, log in, manage finances, and view dashboard summaries. Admin users have a separate panel for user management and system status pages.
+---
 
-## Features
+## ✨ Features
 
-- User authentication with email/password and Google sign-in.
-- Separate user and admin login flows.
-- Income, expense, and budget tracking.
-- Dashboard views with charts and summary cards.
-- Shared theme system and reusable navigation components.
-- Admin user management endpoints for listing, creating, deleting, disabling, and updating users.
+### 👤 User Features
 
-## Tech Stack
+- Secure authentication using Email/Password and Google Sign-In
+- User registration and login
+- Personalized finance dashboard
+- Income management
+- Expense tracking
+- Budget monitoring
+- Interactive charts and financial summaries
+- User profile management
+- Dark/Light theme support
 
-- Front end: HTML, CSS, JavaScript
-- Auth: Firebase Authentication
-- Backend: Flask
-- Database: MongoDB
-- Visualization: Chart.js
-- Icons and UI assets: Font Awesome, custom CSS
+### 🛠️ Admin Features
 
-## Project Structure
+- Separate admin authentication
+- Admin dashboard
+- User management
+  - View users
+  - Create users
+  - Update user details
+  - Disable user accounts
+  - Delete users
+- System status monitoring
+
+---
+
+## 🏗️ Architecture
 
 ```text
-SmartFin/
-├── admin/
-│   ├── ai-status/
-│   ├── components/
-│   ├── dashboard/
-│   └── login/
-├── assets/
-├── backend/
-├── components/
-├── expense/
-├── firebase-config/
-├── home/
-├── income/
-├── login/
-├── profile/
-├── shared/
-└── signup/
+Frontend (HTML, CSS, JavaScript)
+            │
+            ▼
+Firebase Authentication
+            │
+            ▼
+      Flask REST API
+            │
+            ▼
+         MongoDB
 ```
 
-### Main areas
+---
 
-- `home/`: User dashboard and overview charts.
-- `login/` and `signup/`: User authentication screens.
-- `income/` and `expense/`: Transaction entry and management pages.
-- `profile/`: User profile area.
-- `admin/`: Admin login, dashboard, and AI status pages.
-- `shared/`: Theme configuration and shared utilities.
-- `firebase-config/`: Firebase client initialization.
-- `backend/`: Flask API for finance data and admin operations.
+## 🛠️ Tech Stack
 
-## Screenshots
+| Category | Technology |
+|----------|------------|
+| Frontend | HTML5, CSS3, JavaScript |
+| Backend | Flask (Python) |
+| Database | MongoDB |
+| Authentication | Firebase Authentication |
+| Charts | Chart.js |
+| Icons | Font Awesome |
+| Styling | Custom CSS |
 
-### Login and Signup
+---
 
-![Login screen](screenshots/login.png)
+## 📌 Main Modules
 
-### Home Dashboard
+| Module | Description |
+|--------|-------------|
+| **Home** | Dashboard displaying financial summaries, analytics, and charts |
+| **Authentication** | User login, signup, and Google Sign-In |
+| **Income** | Add, edit, and manage income records |
+| **Expense** | Add, edit, and manage expense records |
+| **Profile** | User profile management |
+| **Admin** | User management and system administration |
+| **Shared** | Reusable UI components, navigation, and theme handling |
+| **Backend** | REST APIs for finance data and admin operations |
 
-![Home dashboard](screenshots/home.png)
+---
 
-### Income Tracking
+## 📷 Screenshots
 
-![Income page](screenshots/income.png)
+| Authentication | Dashboard |
+|:--------------:|:---------:|
+| <img src="screenshots/login.png" alt="Login" width="450"/> | <img src="screenshots/home.png" alt="Home Dashboard" width="450"/> |
 
-### Expense Tracking
+| Income Tracking | Expense Tracking |
+|:---------------:|:----------------:|
+| <img src="screenshots/income.png" alt="Income" width="450"/> | <img src="screenshots/expense.png" alt="Expense" width="450"/> |
 
-![Expense page](screenshots/expense.png)
+| Admin Login | Admin Dashboard |
+|:-----------:|:---------------:|
+| <img src="screenshots/admin%20login.png" alt="Admin Login" width="450"/> | <img src="screenshots/admin%20dashboard.png" alt="Admin Dashboard" width="450"/> |
 
-### Admin Login
+---
 
-![Admin login](screenshots/admin%20login.png)
+## 🔒 Security
 
-### Admin Dashboard
+The current backend expects `serviceAccountKey.json` to exist in the project root.
 
-![Admin dashboard](screenshots/admin%20dashboard.png)
+For production deployments:
 
-## Prerequisites
+- Store Firebase credentials using environment variables.
+- Store MongoDB connection strings securely.
+- Never commit secrets to version control.
+- Enable HTTPS in production.
 
-- Python 3.10 or newer
-- MongoDB database access
-- Firebase project with Authentication enabled
-- A local HTTP server for the front end, such as VS Code Live Server or Python's `http.server`
+---
 
-## Setup
+## 📄 License
 
-1. Clone or open the repository in VS Code.
-2. Add your Firebase service account JSON at the project root as `serviceAccountKey.json`.
-3. Verify the Firebase client config in `firebase-config/firebase-config.js` matches your Firebase project.
-4. Update the MongoDB connection string in `backend/app.py` if you are not using the current database.
-5. Install the Python backend dependencies:
-
-```bash
-python3 -m pip install flask flask-cors pymongo firebase-admin
-```
-
-## Run the app locally
-
-### 1. Start the backend
-
-From the project root:
-
-```bash
-python3 backend/app.py
-```
-
-The Flask server runs with debug mode enabled and exposes API endpoints under `http://127.0.0.1:5000`.
-
-### 2. Serve the front end
-
-Because the front end uses absolute paths like `/components/navbar.html` and module imports, it should be opened through a local web server instead of directly from the file system.
-
-If you want to stay close to the backend CORS allowlist, use port 5500:
-
-```bash
-python3 -m http.server 5500
-```
-
-Then open the relevant page in your browser, for example:
-
-- `http://localhost:5500/login/login.html`
-- `http://localhost:5500/signup/signup.html`
-- `http://localhost:5500/home/home.html`
-
-## Backend API
-
-The Flask app currently provides these routes:
-
-- `POST /api/expenses`
-- `GET /api/expenses/<uid>`
-- `DELETE /api/expenses/<expense_id>`
-- `POST /api/incomes`
-- `GET /api/incomes/<uid>`
-- `DELETE /api/incomes/<income_id>`
-- `GET /api/budget/<uid>`
-- `POST /api/budget`
-- `GET /admin/list-users`
-- `DELETE /admin/delete-user/<uid>`
-- `POST /admin/create-user`
-- `POST /admin/change-password/<uid>`
-- `POST /admin/toggle-disable/<uid>`
-
-## Notes
-
-- The app is designed for local development and manual testing through static pages plus the Flask backend.
-- The backend currently expects `serviceAccountKey.json` to exist at the repository root.
-- For production use, move secrets and connection strings into environment variables before deployment.
+This project is intended for educational and learning purposes.
